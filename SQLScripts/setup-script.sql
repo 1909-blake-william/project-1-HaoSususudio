@@ -146,7 +146,7 @@ BEGIN
   RETURNING ers_users_id INTO generated_id;
 END;
 /
-CREATE OR REPLACE PROCEDURE new_reimbursement_rquest
+CREATE OR REPLACE PROCEDURE request_new_reimbursement
 (
   reimb_amount IN number,
   reimb_description IN varchar2,
@@ -197,15 +197,15 @@ BEGIN
     'Pluto', 'Bonedigger', 'pluto@disney.com', 2, gen_id);
   new_ers_user('whinnie', 'gY5npUOBFZ3GnfS6VX7nIQ==','tyWhPi0AbTfNERQzKeRqcQ==',
     'Winnie', 'Xi', 'wxjp@163.com', 2, gen_id);
-  new_reimbursement_rquest(102.53, 'Embassy Inn in Washington DC', 2, 1, gen_id);
-  new_reimbursement_rquest(336.78, 'Plane Tickets to Charlotte, NC', 2, 2, gen_id);
-  new_reimbursement_rquest(8.52, 'McDonalds', 2, 3, gen_id);
-  new_reimbursement_rquest(18.71, 'Uber', 2, 2, gen_id);
-  new_reimbursement_rquest(15.06, 'Dry Cleaning', 2, 4, gen_id);
-  new_reimbursement_rquest(2720.58, 'Car Rental - Lambogini', 3, 2, gen_id);
-  new_reimbursement_rquest(200000.00, '"Activity" Expense', 3, 4, gen_id);
-  new_reimbursement_rquest(52600.00, 'A lot of honey', 5, 3, gen_id);
-  new_reimbursement_rquest(2.10, 'bowbowbow', 4, 3, gen_id);
+  request_new_reimbursement(102.53, 'Embassy Inn in Washington DC', 2, 1, gen_id);
+  request_new_reimbursement(336.78, 'Plane Tickets to Charlotte, NC', 2, 2, gen_id);
+  request_new_reimbursement(8.52, 'McDonalds', 2, 3, gen_id);
+  request_new_reimbursement(18.71, 'Uber', 2, 2, gen_id);
+  request_new_reimbursement(15.06, 'Dry Cleaning', 2, 4, gen_id);
+  request_new_reimbursement(2720.58, 'Car Rental - Lambogini', 3, 2, gen_id);
+  request_new_reimbursement(200000.00, '"Activity" Expense', 3, 4, gen_id);
+  request_new_reimbursement(52600.00, 'A lot of honey', 5, 3, gen_id);
+  request_new_reimbursement(2.10, 'bowbowbow', 4, 3, gen_id);
   UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('10-Oct-19 14:23:10.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 1;
   UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('10-Oct-19 14:34:10.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 2;
   UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('10-Oct-19 14:46:10.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 3;

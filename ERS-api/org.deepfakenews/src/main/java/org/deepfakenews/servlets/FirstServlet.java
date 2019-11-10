@@ -21,7 +21,6 @@ public class FirstServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		System.out.println("request received with uri: " + req.getRequestURI());
 		log.debug("request received with uri: " + req.getRequestURI());
 		resp.getWriter().write("Hello from our first servlet on DeepFakeNews");
 		// redirect
