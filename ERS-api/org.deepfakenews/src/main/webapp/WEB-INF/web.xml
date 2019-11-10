@@ -3,16 +3,17 @@
 	xmlns="http://java.sun.com/xml/ns/javaee"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	version="2.5">
-	<display-name>DeepFakeNews</display-name>
+	<display-name>DeepFakeNewsERSApi</display-name>
 
 	<servlet>
-		<servlet-name>PokemonServlet</servlet-name>
-		<servlet-class>com.revature.servlets.PokemonServlet</servlet-class>
+		<servlet-name>FirstServlet</servlet-name>
+		<servlet-class>org.deepfakenews.servlets.FirstServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>PokemonServlet</servlet-name>
-		<url-pattern>/pokemon/*</url-pattern>
+		<servlet-name>FirstServlet</servlet-name>
+		<url-pattern>/first</url-pattern>
 	</servlet-mapping>
 
 
