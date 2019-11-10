@@ -199,18 +199,22 @@ BEGIN
     'Winnie', 'Xi', 'wxjp@163.com', 2, gen_id);
   new_reimbursement_rquest(102.53, 'Embassy Inn in Washington DC', 2, 1, gen_id);
   new_reimbursement_rquest(336.78, 'Plane Tickets to Charlotte, NC', 2, 2, gen_id);
-  new_reimbursement_rquest(1720.58, 'Car Rental', 3, 2, gen_id);
-  new_reimbursement_rquest(200000, '"Activity" Expense', 3, 4, gen_id);
-  new_reimbursement_rquest(52600, 'A lot of honey', 5, 3, gen_id);
+  new_reimbursement_rquest(8.52, 'McDonalds', 2, 3, gen_id);
+  new_reimbursement_rquest(18.71, 'Uber', 2, 2, gen_id);
+  new_reimbursement_rquest(15.06, 'Dry Cleaning', 2, 4, gen_id);
+  new_reimbursement_rquest(2720.58, 'Car Rental - Lambogini', 3, 2, gen_id);
+  new_reimbursement_rquest(200000.00, '"Activity" Expense', 3, 4, gen_id);
+  new_reimbursement_rquest(52600.00, 'A lot of honey', 5, 3, gen_id);
   new_reimbursement_rquest(2.10, 'bowbowbow', 4, 3, gen_id);
-  UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('10-Oct-19 14:43:10.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 1;
-  UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('10-Oct-19 14:48:10.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 2;
-  UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('11-Oct-19 18:52:11.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 3;
-  UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('19-Oct-19 02:23:58.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 4;
-  UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('04-Nov-19 11:33:56.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 5;
-  UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('05-Nov-19 12:20:05.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 6;
-
-
+  UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('10-Oct-19 14:23:10.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 1;
+  UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('10-Oct-19 14:34:10.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 2;
+  UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('10-Oct-19 14:46:10.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 3;
+  UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('10-Oct-19 14:48:10.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 4;
+  UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('10-Oct-19 14:53:10.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 5;
+  UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('11-Oct-19 18:52:11.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 6;
+  UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('19-Oct-19 02:23:58.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 7;
+  UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('04-Nov-19 11:33:56.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 8;
+  UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('05-Nov-19 12:20:05.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 9;
 END;
 /
 COMMIT;
