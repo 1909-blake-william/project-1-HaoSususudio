@@ -8,13 +8,20 @@
 	<servlet>
 		<servlet-name>FirstServlet</servlet-name>
 		<servlet-class>org.deepfakenews.servlets.FirstServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
+		<!-- <load-on-startup>1</load-on-startup> -->
 	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>FirstServlet</servlet-name>
 		<url-pattern>/first</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>UserInfoServlet</servlet-name>
+		<servlet-class>org.deepfakenews.servlets.UserInfoServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>UserInfoServlet</servlet-name>
+		<url-pattern>/userinfo</url-pattern>
+	</servlet-mapping>
 
 </web-app>

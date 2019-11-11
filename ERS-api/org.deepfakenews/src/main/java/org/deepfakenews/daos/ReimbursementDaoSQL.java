@@ -25,13 +25,13 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
     Timestamp submittedTime = rs.getTimestamp("reimb_submitted");
     Timestamp resolvedTime = rs.getTimestamp("reimb_resolved");
     String description = rs.getString("reimb_description");
-
+    // UserInfo object about the author
     int authorId = rs.getInt("ers_users_id");
     String authorFirstName = rs.getString("user_first_name");
     String authorlastName = rs.getString("user_last_name");
     String authorEmail = rs.getString("user_email");
     String authorRole = rs.getString("user_role");
-
+    // UserInfo object about the resolver
     int resolverId = rs.getInt("ers_users_id");
     String resolverFirstName = rs.getString("user_first_name");
     String resolverlastName = rs.getString("user_last_name");
