@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.deepfakenews.daos.UserInfoDao;
 import org.deepfakenews.models.UserInfo;
 
@@ -16,14 +15,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class UserInfoServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
-  private Logger log = Logger.getRootLogger();
+//  private Logger log = Logger.getRootLogger();
   private UserInfoDao userInfoDao = UserInfoDao.currentImplementation;
 
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     super.service(req, resp);
-    log.debug("To context param: " + req.getServletContext().getInitParameter("To"));
+//    log.debug("To context param: " + req.getServletContext().getInitParameter("To"));
     resp.addHeader("Access-Control-Allow-Origin", "http://localhost:4200");
     resp.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, HEAD");
     resp.addHeader("Access-Control-Allow-Headers",
@@ -44,8 +43,8 @@ public class UserInfoServlet extends HttpServlet {
 //      pokemon = pokeDao.findByTrainerName(trainerName);
 //    } else { // find all
     usrInfo = userInfoDao.findAll();
-    log.debug("testing userinfo servlet");
-    log.debug(usrInfo);
+//    log.debug("testing userinfo servlet");
+//    log.debug(usrInfo);
 
 //    }
 //
