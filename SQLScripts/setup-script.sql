@@ -125,7 +125,7 @@ BEGIN
   END IF;
 END;
 /
-----------------------PROCEDURE FOR DATA INSERTION-------------
+----------------------PROCEDURE FOR DATA MANUPULATION-------------
 CREATE OR REPLACE PROCEDURE new_ers_user
 (
   ers_username IN varchar2,
@@ -163,6 +163,105 @@ BEGIN
   RETURNING reimb_id INTO generated_id;
 END;
 /
+CREATE OR REPLACE PROCEDURE approve_reimbursement
+(
+  reimb_id_in IN ers_reimbursement.reimb_id%TYPE,
+  reimb_resolver_in IN ers_reimbursement.reimb_resolver%TYPE
+)
+AS
+BEGIN
+  UPDATE ers_reimbursement
+  SET reimb_resolver = reimb_resolver_in, reimb_resolved = CURRENT_TIMESTAMP, reimb_status_id = 2
+  WHERE reimb_id = reimb_id_in;
+END;
+/
+CREATE OR REPLACE PROCEDURE deny_reimbursement
+(
+  reimb_id_in IN ers_reimbursement.reimb_id%TYPE,
+  reimb_resolver_in IN ers_reimbursement.reimb_resolver%TYPE
+)
+AS
+BEGIN
+  UPDATE ers_reimbursement
+  SET reimb_resolver = reimb_resolver_in, reimb_resolved = CURRENT_TIMESTAMP, reimb_status_id = 3
+  WHERE reimb_id = reimb_id_in;
+END;
+/
+-------------------FUNCTIONS FOR DATA QUERRY-------------------------
+CREATE OR REPLACE PROCEDURE get_all_reimbursements
+(
+  out_cursor_reimb OUT SYS_REFCURSOR
+)
+AS
+BEGIN
+  OPEN out_cursor_reimb FOR
+  SELECT  reimb.reimb_id, reimb.reimb_amount, reimb.reimb_submitted, reimb.reimb_resolved, reimb.reimb_description,
+    author.ers_users_id, author.user_first_name, author.user_last_name, author.user_email, a_role.user_role,
+    resolver.ers_users_id, resolver.user_first_name, resolver.user_last_name, resolver.user_email, r_role.user_role,
+    sta.reimb_status, rtype.reimb_type
+  FROM ers_reimbursement reimb
+  LEFT JOIN ers_users author ON (reimb.reimb_author = author.ers_users_id)
+  LEFT JOIN ers_user_roles a_role ON (author.user_role_id = a_role.ers_user_role_id)
+  LEFT JOIN ers_users resolver ON (reimb.reimb_resolver = resolver.ers_users_id)
+  LEFT JOIN ers_user_roles r_role ON (resolver.user_role_id = r_role.ers_user_role_id)
+  LEFT JOIN ers_reimbursement_status sta ON (reimb.reimb_status_id = sta.reimb_status_id)
+  LEFT JOIN ers_reimbursement_type rtype ON (reimb.reimb_type_id = rtype.reimb_type_id)
+  ORDER BY reimb.reimb_id;
+END;
+/
+CREATE OR REPLACE PROCEDURE get_all_user_info
+(
+  out_cursor_user_info OUT SYS_REFCURSOR
+)
+AS
+BEGIN
+  OPEN out_cursor_user_info FOR
+  SELECT ers_users_id, user_first_name, user_last_name, user_email, u_role.user_role
+  FROM ers_users u
+  LEFT JOIN ers_user_roles u_role ON (u.user_role_id = u_role.ers_user_role_id)
+  ORDER BY u.ers_users_id;
+END;
+/
+
+
+
+
+
+SET SERVEROUTPUT ON
+DECLARE c_out sys_refcursor;
+  reimb_id number;
+  reimb_amount number;
+  reimb_submitted timestamp;
+  reimb_resolved timestamp;
+  reimb_description varchar2;
+  author_id number;
+  author_first_name varchar2;
+  author_last_name varchar2;
+  author_email varchar2; 
+  a_role varchar2;
+  resolver_id number;
+  resolver_first_name varchar2;
+  resolver_last_name varchar2;
+  resolver_email varchar2;
+  r_role varchar2;
+  reimb_status varchar2;
+  reimb_type varchar2;
+BEGIN
+    get_all_reimbursements(c_out);
+  --   LOOP 
+  --       FETCH c_out
+  --       INTO  reimb_id, reimb_amount, reimb_submitted, reimb_resolved, reimb_description,
+  --         author_id, author_first_name, author_last_name, author_email, a_role,
+  --         resolver_id, resolver_first_name, resolver_last_name, resolver_email, r_role,
+  --         reimb_status, reimb_type;
+  --       EXIT WHEN c_out%NOTFOUND;
+  --       DBMS_OUTPUT.PUT_LINE(reimb_id || ' ' || author_id || ' ' || resolver_id || ' ' || reimb_status);
+  --   END LOOP;
+  -- CLOSE c_out;
+END;
+/
+
+
 
 --------------------REFRENCE TABLES DATA INSERTION------------------
 INSERT INTO ers_reimbursement_type(reimb_type)
@@ -180,9 +279,9 @@ VALUES('APPROVED');
 INSERT INTO ers_reimbursement_status(reimb_status)
 VALUES('DENIED');
 INSERT INTO ers_user_roles(user_role)
-VALUES ('EMPLOYEE');
-INSERT INTO ers_user_roles(user_role)
 VALUES ('MANAGER');
+INSERT INTO ers_user_roles(user_role)
+VALUES ('EMPLOYEE');
 --------------INSERT DUMMY USERS AND REIMBURSEMENTS-----------------
 SET SERVEROUTPUT ON
 DECLARE gen_id number;
@@ -202,6 +301,7 @@ BEGIN
   request_new_reimbursement(8.52, 'McDonalds', 2, 3, gen_id);
   request_new_reimbursement(18.71, 'Uber', 2, 2, gen_id);
   request_new_reimbursement(15.06, 'Dry Cleaning', 2, 4, gen_id);
+  request_new_reimbursement(18.00, 'Chestnut Cake', 3, 3, gen_id);
   request_new_reimbursement(2720.58, 'Car Rental - Lambogini', 3, 2, gen_id);
   request_new_reimbursement(200000.00, '"Activity" Expense', 3, 4, gen_id);
   request_new_reimbursement(52600.00, 'A lot of honey', 5, 3, gen_id);
@@ -213,12 +313,38 @@ BEGIN
   UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('10-Oct-19 14:53:10.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 5;
   UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('11-Oct-19 18:52:11.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 6;
   UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('19-Oct-19 02:23:58.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 7;
-  UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('04-Nov-19 11:33:56.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 8;
+  UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('21-Oct-19 11:33:56.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 8;
   UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('05-Nov-19 12:20:05.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 9;
+  UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('07-Nov-19 09:10:55.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 10;
+  approve_reimbursement(1,1);
+  approve_reimbursement(2,1);
+  deny_reimbursement(3,1);
+  approve_reimbursement(6,1);
+  deny_reimbursement(7,1);
+  UPDATE ers_reimbursement SET reimb_resolved = TO_TIMESTAMP ('13-Oct-19 09:23:11.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 1;
+  UPDATE ers_reimbursement SET reimb_resolved = TO_TIMESTAMP ('13-Oct-19 09:24:45.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 2;
+  UPDATE ers_reimbursement SET reimb_resolved = TO_TIMESTAMP ('13-Oct-19 09:29:55.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 3;
+  UPDATE ers_reimbursement SET reimb_resolved = TO_TIMESTAMP ('18-Oct-19 10:52:11.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 6;
+  UPDATE ers_reimbursement SET reimb_resolved = TO_TIMESTAMP ('18-Oct-19 11:01:19.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 7;
 END;
 /
 COMMIT;
---------------------TEST SELECT-------------------
+
+
+-- SELECT  reimb.reimb_id, reimb.reimb_amount, reimb.reimb_submitted, reimb.reimb_resolved, reimb.reimb_description,
+--   author.ers_users_id, author.ers_username, author.user_first_name, author.user_last_name, author.user_email, a_role.user_role,
+--   resolver.ers_users_id, resolver.ers_username, resolver.user_first_name, resolver.user_last_name, resolver.user_email, r_role.user_role,
+--   sta.reimb_status, rtype.reimb_type
+-- FROM ers_reimbursement reimb
+-- LEFT JOIN ers_users author ON (reimb.reimb_author = author.ers_users_id)
+-- LEFT JOIN ers_user_roles a_role ON (author.user_role_id = a_role.ers_user_role_id)
+-- LEFT JOIN ers_users resolver ON (reimb.reimb_resolver = resolver.ers_users_id)
+-- LEFT JOIN ers_user_roles r_role ON (resolver.user_role_id = r_role.ers_user_role_id)
+-- LEFT JOIN ers_reimbursement_status sta ON (reimb.reimb_status_id = sta.reimb_status_id)
+-- LEFT JOIN ers_reimbursement_type rtype ON (reimb.reimb_type_id = rtype.reimb_type_id)
+-- ORDER BY reimb.reimb_id;
+
+--------------------TEST SELECT------------------
 -- SELECT * FROM ers_reimbursement_type;
 -- SELECT * FROM ers_reimbursement_status; 
 -- SELECT * FROM ers_user_roles;

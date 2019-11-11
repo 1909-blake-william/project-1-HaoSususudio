@@ -3,111 +3,113 @@ package org.deepfakenews.models;
 import java.sql.Timestamp;
 
 public class Reimbursement {
-	private int reimbId;
-	private double amount;
-	private Timestamp submittedTime;
-	private Timestamp resolvedTime;
-	private String description;
-	private int authorId;
-	private int resolverId;
-	private int statusId;
-	private int typeId;
+  private int reimbId;
+  private double amount;
+  private Timestamp submittedTime;
+  private Timestamp resolvedTime;
+  private String description;
+  private UserInfo author;
+  private UserInfo resolver;
+  private String status;
+  private String type;
 
-	public Reimbursement() {
-		super();
-	}
+  public Reimbursement() {
+    super();
+  }
 
-	public Reimbursement(int reimbId, double amount, Timestamp submittedTime, Timestamp resolvedTime,
-			String description, int authorId, int resolverId, int statusId, int typeId) {
-		super();
-		this.reimbId = reimbId;
-		this.amount = amount;
-		this.submittedTime = submittedTime;
-		this.resolvedTime = resolvedTime;
-		this.description = description;
-		this.authorId = authorId;
-		this.resolverId = resolverId;
-		this.statusId = statusId;
-		this.typeId = typeId;
-	}
+  public Reimbursement(int reimbId, double amount, Timestamp submittedTime,
+      Timestamp resolvedTime, String description, UserInfo author,
+      UserInfo resolver, String status, String type) {
+    super();
+    this.reimbId = reimbId;
+    this.amount = amount;
+    this.submittedTime = submittedTime;
+    this.resolvedTime = resolvedTime;
+    this.description = description;
+    this.author = author;
+    this.resolver = resolver;
+    this.status = status;
+    this.type = type;
+  }
 
-	public int getReimbId() {
-		return reimbId;
-	}
+  public int getReimbId() {
+    return reimbId;
+  }
 
-	public void setReimbId(int reimbId) {
-		this.reimbId = reimbId;
-	}
+  public void setReimbId(int reimbId) {
+    this.reimbId = reimbId;
+  }
 
-	public double getAmount() {
-		return amount;
-	}
+  public double getAmount() {
+    return amount;
+  }
 
-	public void setAmount(double amount) {
-		this.amount = amount;
-	}
+  public void setAmount(double amount) {
+    this.amount = amount;
+  }
 
-	public Timestamp getSubmittedTime() {
-		return submittedTime;
-	}
+  public Timestamp getSubmittedTime() {
+    return submittedTime;
+  }
 
-	public void setSubmittedTime(Timestamp submittedTime) {
-		this.submittedTime = submittedTime;
-	}
+  public void setSubmittedTime(Timestamp submittedTime) {
+    this.submittedTime = submittedTime;
+  }
 
-	public Timestamp getResolvedTime() {
-		return resolvedTime;
-	}
+  public Timestamp getResolvedTime() {
+    return resolvedTime;
+  }
 
-	public void setResolvedTime(Timestamp resolvedTime) {
-		this.resolvedTime = resolvedTime;
-	}
+  public void setResolvedTime(Timestamp resolvedTime) {
+    this.resolvedTime = resolvedTime;
+  }
 
-	public String getDescription() {
-		return description;
-	}
+  public String getDescription() {
+    return description;
+  }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-	public int getAuthorId() {
-		return authorId;
-	}
+  public UserInfo getAuthor() {
+    return author;
+  }
 
-	public void setAuthorId(int authorId) {
-		this.authorId = authorId;
-	}
+  public void setAuthor(UserInfo author) {
+    this.author = author;
+  }
 
-	public int getResolverId() {
-		return resolverId;
-	}
+  public UserInfo getResolver() {
+    return resolver;
+  }
 
-	public void setResolverId(int resolverId) {
-		this.resolverId = resolverId;
-	}
+  public void setResolver(UserInfo resolver) {
+    this.resolver = resolver;
+  }
 
-	public int getStatusId() {
-		return statusId;
-	}
+  public String getStatus() {
+    return status;
+  }
 
-	public void setStatusId(int statusId) {
-		this.statusId = statusId;
-	}
+  public void setStatus(String status) {
+    this.status = status;
+  }
 
-	public int getTypeId() {
-		return typeId;
-	}
+  public String getType() {
+    return type;
+  }
 
-	public void setTypeId(int typeId) {
-		this.typeId = typeId;
-	}
+  public void setType(String type) {
+    this.type = type;
+  }
 
-	@Override
-	public String toString() {
-		return "Reimbursement [reimbId=" + reimbId + ", amount=" + amount + ", submittedTime=" + submittedTime
-				+ ", resolvedTime=" + resolvedTime + ", description=" + description + ", authorId=" + authorId
-				+ ", resolverId=" + resolverId + ", statusId=" + statusId + ", typeId=" + typeId + "]";
-	}
+  @Override
+  public String toString() {
+    return "Reimbursement [reimbId=" + reimbId + ", amount=" + amount
+        + ", submittedTime=" + submittedTime + ", resolvedTime=" + resolvedTime
+        + ", description=" + description + ", author=" + author + ", resolver="
+        + resolver + ", status=" + status + ", type=" + type + "]";
+  }
 
 }

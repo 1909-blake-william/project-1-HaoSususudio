@@ -1,7 +1,7 @@
 package org.deepfakenews.daos;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -10,7 +10,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.deepfakenews.models.Reimbursement;
+import org.deepfakenews.models.UserInfo;
 import org.deepfakenews.util.ConnectionUtil;
+
+import oracle.jdbc.OracleTypes;
 
 public class ReimbursementDaoSQL implements ReimbursementDao {
 
@@ -22,12 +25,26 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
     Timestamp submittedTime = rs.getTimestamp("reimb_submitted");
     Timestamp resolvedTime = rs.getTimestamp("reimb_resolved");
     String description = rs.getString("reimb_description");
-    int authorId = rs.getInt("reimb_author");
-    int resolverId = rs.getInt("reimb_resolver");
-    int statusId = rs.getInt("reimb_status_id");
-    int typeId = rs.getInt("reimb_type_id");
-    return new Reimbursement(reimbId, amount, submittedTime, resolvedTime,
-        description, authorId, resolverId, statusId, typeId);
+
+    int authorId = rs.getInt("ers_users_id");
+    String authorFirstName = rs.getString("user_first_name");
+    String authorlastName = rs.getString("user_last_name");
+    String authorEmail = rs.getString("user_email");
+    String authorRole = rs.getString("user_role");
+
+    int resolverId = rs.getInt("ers_users_id");
+    String resolverFirstName = rs.getString("user_first_name");
+    String resolverlastName = rs.getString("user_last_name");
+    String resolverEmail = rs.getString("user_email");
+    String resolverRole = rs.getString("user_role");
+
+    String status = rs.getString("reimb_status");
+    String type = rs.getString("reimb_type");
+
+    return new Reimbursement(reimbId, amount, submittedTime, resolvedTime, description,
+        new UserInfo(authorId, authorFirstName, authorlastName, authorEmail, authorRole),
+        new UserInfo(resolverId, resolverFirstName, resolverlastName, resolverEmail, resolverRole),
+        status, type);
 
   }
 
@@ -38,15 +55,13 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
   }
 
   @Override
-  public int approve(Reimbursement reimb) {
+  public void approve(int reimbId, int resolverId) {
     // TODO Auto-generated method stub
-    return 0;
   }
 
   @Override
-  public int deny(Reimbursement reimb) {
+  public void deny(int reimbId, int resolverId) {
     // TODO Auto-generated method stub
-    return 0;
   }
 
   @Override
@@ -59,11 +74,12 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
   public List<Reimbursement> findAll() {
     log.debug("Attempting to find all Reimbursements from DB");
     try (Connection c = ConnectionUtil.getConnection()) {
-      String sql = "SELECT * FROM Reimbursement";
-//          + "LEFT JOIN pokemon_types t ON (p.pokemon_type_id = t.pokemon_types_id) "
-//          + "LEFT JOIN pokemon_users u ON (p.trainer = u.user_id)";
-      PreparedStatement ps = c.prepareStatement(sql);
-      ResultSet rs = ps.executeQuery();
+      CallableStatement cs = c.prepareCall("call get_all_reimbursements(?)");
+      cs.registerOutParameter(1, OracleTypes.CURSOR);
+      cs.execute();
+
+      ResultSet rs = (ResultSet) cs.getObject(1);
+
       List<Reimbursement> allReimbs = new ArrayList<>();
       while (rs.next()) {
         allReimbs.add(extractReimb(rs));
