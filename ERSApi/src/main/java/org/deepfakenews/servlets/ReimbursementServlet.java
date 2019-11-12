@@ -20,7 +20,7 @@ public class ReimbursementServlet extends HttpServlet {
   protected void service(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     super.service(req, resp);
-    System.out.println("To context param: " + req.getServletContext().getInitParameter("To"));
+//    System.out.println("To context param: " + req.getServletContext().getInitParameter("To"));
 
     resp.addHeader("Access-Control-Allow-Origin", "http://localhost:4200");
     resp.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, HEAD");
@@ -36,9 +36,10 @@ public class ReimbursementServlet extends HttpServlet {
 
     List<Reimbursement> reimbs;
 
-    String authorUsername = req.getParameter("author");
+    String authorUsername = req.getParameter("author").toLowerCase();
+    String reimbStatus = req.getParameter("status").toUpperCase();
 
-    if (authorUsername != null) { // find by trainer name
+    if (authorUsername != null) { // find by authorUsername
       reimbs = reimbDao.findByAuthorUsername(authorUsername);
     } else { // find all
       reimbs = reimbDao.findAll();
@@ -48,6 +49,7 @@ public class ReimbursementServlet extends HttpServlet {
     String json = om.writeValueAsString(reimbs);
 
     resp.addHeader("content-type", "application/json");
+    resp.getWriter().write("status = " + reimbStatus);
     resp.getWriter().write(json);
   }
 

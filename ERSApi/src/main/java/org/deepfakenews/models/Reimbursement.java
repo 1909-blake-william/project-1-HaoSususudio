@@ -4,29 +4,30 @@ import java.sql.Timestamp;
 
 public class Reimbursement {
   private int reimbId;
-  private double amount;
+  private Double amount;
   private Timestamp submittedTime;
   private Timestamp resolvedTime;
   private String description;
-  private UserInfo author;
-  private UserInfo resolver;
+  private Integer authorId;
+  private Integer resolverId;
   private String status;
   private String type;
 
   public Reimbursement() {
     super();
+    // TODO Auto-generated constructor stub
   }
 
   public Reimbursement(int reimbId, double amount, Timestamp submittedTime, Timestamp resolvedTime,
-      String description, UserInfo author, UserInfo resolver, String status, String type) {
+      String description, int authorId, int resolverId, String status, String type) {
     super();
     this.reimbId = reimbId;
     this.amount = amount;
     this.submittedTime = submittedTime;
     this.resolvedTime = resolvedTime;
     this.description = description;
-    this.author = author;
-    this.resolver = resolver;
+    this.authorId = authorId;
+    this.resolverId = resolverId;
     this.status = status;
     this.type = type;
   }
@@ -71,20 +72,20 @@ public class Reimbursement {
     this.description = description;
   }
 
-  public UserInfo getAuthor() {
-    return author;
+  public int getAuthorId() {
+    return authorId;
   }
 
-  public void setAuthor(UserInfo author) {
-    this.author = author;
+  public void setAuthorId(int authorId) {
+    this.authorId = authorId;
   }
 
-  public UserInfo getResolver() {
-    return resolver;
+  public int getResolverId() {
+    return resolverId;
   }
 
-  public void setResolver(UserInfo resolver) {
-    this.resolver = resolver;
+  public void setResolverId(int resolverId) {
+    this.resolverId = resolverId;
   }
 
   public String getStatus() {
@@ -107,8 +108,8 @@ public class Reimbursement {
   public String toString() {
     return "Reimbursement [reimbId=" + reimbId + ", amount=" + amount + ", submittedTime="
         + submittedTime + ", resolvedTime=" + resolvedTime + ", description=" + description
-        + ", author=" + author + ", resolver=" + resolver + ", status=" + status + ", type=" + type
-        + "]";
+        + ", authorId=" + authorId + ", resolverId=" + resolverId + ", status=" + status + ", type="
+        + type + "]";
   }
 
 }

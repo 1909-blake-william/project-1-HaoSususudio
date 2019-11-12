@@ -5,24 +5,23 @@ import java.util.List;
 import org.deepfakenews.daos.ReimbursementDao;
 import org.deepfakenews.daos.UserInfoDao;
 import org.deepfakenews.models.Reimbursement;
-import org.deepfakenews.models.UserInfo;
 
 public class TestDriver {
   public static void main(String[] args) {
     ReimbursementDao reimbDao = ReimbursementDao.currentImplementation;
     UserInfoDao userInfoDao = UserInfoDao.currentImplementation;
 
-    List<Reimbursement> allReimbs = reimbDao.findAll();
-    for (Reimbursement each : allReimbs) {
-      System.out.println(each);
-    }
+//    List<Reimbursement> allReimbs = reimbDao.findAll();
+//    for (Reimbursement each : allReimbs) {
+//      System.out.println(each);
+//    }
 
-    List<UserInfo> allUserInfo = userInfoDao.findAll();
-    for (UserInfo each : allUserInfo) {
-      System.out.println(each);
-    }
-
-    List<Reimbursement> reimbsByAuthor = reimbDao.findByAuthorUsername("chip");
+//    List<UserInfo> allUserInfo = userInfoDao.findAll();
+//    for (UserInfo each : allUserInfo) {
+//      System.out.println(each);
+//    }
+//
+    List<Reimbursement> reimbsByAuthor = reimbDao.findByAuthorUsername("");
     for (Reimbursement each : reimbsByAuthor) {
       System.out.println(each);
     }

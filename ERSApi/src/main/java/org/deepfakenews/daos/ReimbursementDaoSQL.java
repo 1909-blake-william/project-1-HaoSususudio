@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.deepfakenews.models.Reimbursement;
-import org.deepfakenews.models.UserInfo;
 import org.deepfakenews.util.ConnectionUtil;
 
 import oracle.jdbc.OracleTypes;
@@ -20,34 +19,17 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
 
   Reimbursement extractReimb(ResultSet rs) throws SQLException {
     int reimbId = rs.getInt("reimb_id");
-    double amount = rs.getDouble("reimb_amount");
+    Double amount = rs.getDouble("reimb_amount");
     Timestamp submittedTime = rs.getTimestamp("reimb_submitted");
     Timestamp resolvedTime = rs.getTimestamp("reimb_resolved");
     String description = rs.getString("reimb_description");
-    // UserInfo object about the author
-    int authorId = rs.getInt("ers_users_id");
-    String authorUsername = rs.getString("ers_username");
-    String authorFirstName = rs.getString("user_first_name");
-    String authorlastName = rs.getString("user_last_name");
-    String authorEmail = rs.getString("user_email");
-    String authorRole = rs.getString("user_role");
-    // UserInfo object about the resolver
-    int resolverId = rs.getInt("ers_users_id");
-    String resolverUsername = rs.getString("ers_username");
-    String resolverFirstName = rs.getString("user_first_name");
-    String resolverlastName = rs.getString("user_last_name");
-    String resolverEmail = rs.getString("user_email");
-    String resolverRole = rs.getString("user_role");
-
+    Integer authorId = rs.getInt("reimb_author");
+    Integer resolverId = rs.getInt("reimb_resolver");
     String status = rs.getString("reimb_status");
     String type = rs.getString("reimb_type");
 
-    return new Reimbursement(reimbId, amount, submittedTime, resolvedTime, description,
-        new UserInfo(authorId, authorUsername, authorFirstName, authorlastName, authorEmail,
-            authorRole),
-        new UserInfo(resolverId, resolverUsername, resolverFirstName, resolverlastName,
-            resolverEmail, resolverRole),
-        status, type);
+    return new Reimbursement(reimbId, amount, submittedTime, resolvedTime, description, authorId,
+        resolverId, status, type);
 
   }
 
@@ -76,11 +58,11 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
   @Override
   public List<Reimbursement> findAll() {
 //    log.debug("Attempting to find all Reimbursements from DB");
+
     try (Connection c = ConnectionUtil.getConnection()) {
       CallableStatement cs = c.prepareCall("call get_all_reimbursements(?)");
       cs.registerOutParameter(1, OracleTypes.CURSOR);
       cs.execute();
-
       ResultSet rs = (ResultSet) cs.getObject(1);
 
       List<Reimbursement> allReimbs = new ArrayList<>();
@@ -97,7 +79,7 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
   @Override
   public List<Reimbursement> findByAuthorUsername(String authorUsername) {
     try (Connection c = ConnectionUtil.getConnection()) {
-      CallableStatement cs = c.prepareCall("call get_reimb_by_author_username(?, ?)");
+      CallableStatement cs = c.prepareCall("call get_reimb_by_author(?, ?)");
       cs.setString(1, authorUsername);
       cs.registerOutParameter(2, OracleTypes.CURSOR);
       cs.execute();
