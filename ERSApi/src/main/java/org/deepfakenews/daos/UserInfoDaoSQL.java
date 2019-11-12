@@ -17,11 +17,12 @@ public class UserInfoDaoSQL implements UserInfoDao {
 
   UserInfo extractUserInfo(ResultSet rs) throws SQLException {
     int userId = rs.getInt("ers_users_id");
+    String username = rs.getString("ers_username");
     String firstName = rs.getString("user_first_name");
     String lastName = rs.getString("user_last_name");
     String email = rs.getString("user_email");
     String userRole = rs.getString("user_role");
-    return new UserInfo(userId, firstName, lastName, email, userRole);
+    return new UserInfo(userId, username, firstName, lastName, email, userRole);
   }
 
   @Override

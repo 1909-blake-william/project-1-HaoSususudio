@@ -5,7 +5,6 @@
 	version="2.5">
 	<display-name>DFNERSApi</display-name>
 
-
 	<servlet>
 		<servlet-name>OurFirstServlet</servlet-name>
 		<servlet-class>org.deepfakenews.servlets.FirstServlet</servlet-class>
@@ -15,15 +14,22 @@
 		<url-pattern>/first</url-pattern>
 	</servlet-mapping>
 
-
 	<servlet>
 		<servlet-name>UserServlet</servlet-name>
 		<servlet-class>org.deepfakenews.servlets.UserServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>UserServlet</servlet-name>
-		<url-pattern>/users</url-pattern>
+		<url-pattern>/users/*</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>ReimbursementServlet</servlet-name>
+		<servlet-class>org.deepfakenews.servlets.ReimbursementServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ReimbursementServlet</servlet-name>
+		<url-pattern>/reimbursements/*</url-pattern>
+	</servlet-mapping>
 
 </web-app>

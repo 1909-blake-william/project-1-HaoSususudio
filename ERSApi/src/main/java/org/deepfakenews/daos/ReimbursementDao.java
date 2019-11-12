@@ -17,6 +17,6 @@ public interface ReimbursementDao {
 
   List<Reimbursement> findAll();
 
-  List<Reimbursement> findByAuthorId();
+  List<Reimbursement> findByAuthorUsername(String authorUsername);
 
 }

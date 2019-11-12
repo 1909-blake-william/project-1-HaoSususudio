@@ -2,6 +2,7 @@ package org.deepfakenews.models;
 
 public class UserInfo {
   private int userId;
+  private String username;
   private String firstName;
   private String lastName;
   private String email;
@@ -9,11 +10,14 @@ public class UserInfo {
 
   public UserInfo() {
     super();
+    // TODO Auto-generated constructor stub
   }
 
-  public UserInfo(int userId, String firstName, String lastName, String email, String userRole) {
+  public UserInfo(int userId, String username, String firstName, String lastName, String email,
+      String userRole) {
     super();
     this.userId = userId;
+    this.username = username;
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
@@ -26,6 +30,14 @@ public class UserInfo {
 
   public void setUserId(int userId) {
     this.userId = userId;
+  }
+
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
   }
 
   public String getFirstName() {
@@ -62,8 +74,8 @@ public class UserInfo {
 
   @Override
   public String toString() {
-    return "UserInfo [userId=" + userId + ", firstName=" + firstName + ", lastName=" + lastName
-        + ", email=" + email + ", userRole=" + userRole + "]";
+    return "UserInfo [userId=" + userId + ", username=" + username + ", firstName=" + firstName
+        + ", lastName=" + lastName + ", email=" + email + ", userRole=" + userRole + "]";
   }
 
 }

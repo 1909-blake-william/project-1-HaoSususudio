@@ -26,12 +26,14 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
     String description = rs.getString("reimb_description");
     // UserInfo object about the author
     int authorId = rs.getInt("ers_users_id");
+    String authorUsername = rs.getString("ers_username");
     String authorFirstName = rs.getString("user_first_name");
     String authorlastName = rs.getString("user_last_name");
     String authorEmail = rs.getString("user_email");
     String authorRole = rs.getString("user_role");
     // UserInfo object about the resolver
     int resolverId = rs.getInt("ers_users_id");
+    String resolverUsername = rs.getString("ers_username");
     String resolverFirstName = rs.getString("user_first_name");
     String resolverlastName = rs.getString("user_last_name");
     String resolverEmail = rs.getString("user_email");
@@ -41,8 +43,10 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
     String type = rs.getString("reimb_type");
 
     return new Reimbursement(reimbId, amount, submittedTime, resolvedTime, description,
-        new UserInfo(authorId, authorFirstName, authorlastName, authorEmail, authorRole),
-        new UserInfo(resolverId, resolverFirstName, resolverlastName, resolverEmail, resolverRole),
+        new UserInfo(authorId, authorUsername, authorFirstName, authorlastName, authorEmail,
+            authorRole),
+        new UserInfo(resolverId, resolverUsername, resolverFirstName, resolverlastName,
+            resolverEmail, resolverRole),
         status, type);
 
   }
@@ -91,9 +95,23 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
   }
 
   @Override
-  public List<Reimbursement> findByAuthorId() {
-    // TODO Auto-generated method stub
-    return null;
-  }
+  public List<Reimbursement> findByAuthorUsername(String authorUsername) {
+    try (Connection c = ConnectionUtil.getConnection()) {
+      CallableStatement cs = c.prepareCall("call get_reimb_by_author_username(?, ?)");
+      cs.setString(1, authorUsername);
+      cs.registerOutParameter(2, OracleTypes.CURSOR);
+      cs.execute();
 
+      ResultSet rs = (ResultSet) cs.getObject(2);
+
+      List<Reimbursement> reimbsByAuthor = new ArrayList<>();
+      while (rs.next()) {
+        reimbsByAuthor.add(extractReimb(rs));
+      }
+      return reimbsByAuthor;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
 }

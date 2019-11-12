@@ -21,5 +21,10 @@ public class TestDriver {
     for (UserInfo each : allUserInfo) {
       System.out.println(each);
     }
+
+    List<Reimbursement> reimbsByAuthor = reimbDao.findByAuthorUsername("chip");
+    for (Reimbursement each : reimbsByAuthor) {
+      System.out.println(each);
+    }
   }
 }
