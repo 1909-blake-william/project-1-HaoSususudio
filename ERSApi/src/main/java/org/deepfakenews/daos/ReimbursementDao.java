@@ -19,4 +19,8 @@ public interface ReimbursementDao {
 
   List<Reimbursement> findByAuthorUsername(String authorUsername);
 
+  List<Reimbursement> findByStatus(String status);
+
+  List<Reimbursement> findByAuthorAndStatus(String authorUsername, String status);
+
 }

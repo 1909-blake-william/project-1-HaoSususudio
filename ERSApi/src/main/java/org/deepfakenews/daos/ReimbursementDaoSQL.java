@@ -8,6 +8,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.deepfakenews.models.Reimbursement;
 import org.deepfakenews.util.ConnectionUtil;
 
@@ -15,7 +16,7 @@ import oracle.jdbc.OracleTypes;
 
 public class ReimbursementDaoSQL implements ReimbursementDao {
 
-//  private Logger log = Logger.getRootLogger();
+  private Logger log = Logger.getRootLogger();
 
   Reimbursement extractReimb(ResultSet rs) throws SQLException {
     int reimbId = rs.getInt("reimb_id");
@@ -30,7 +31,6 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
 
     return new Reimbursement(reimbId, amount, submittedTime, resolvedTime, description, authorId,
         resolverId, status, type);
-
   }
 
   @Override
@@ -57,7 +57,7 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
 
   @Override
   public List<Reimbursement> findAll() {
-//    log.debug("Attempting to find all Reimbursements from DB");
+    log.debug("Attempting to find all Reimbursements from DB");
 
     try (Connection c = ConnectionUtil.getConnection()) {
       CallableStatement cs = c.prepareCall("call get_all_reimbursements(?)");
@@ -71,7 +71,7 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
       }
       return allReimbs;
     } catch (SQLException e) {
-      e.printStackTrace();
+      e.printStackTrace(); 
       return null;
     }
   }
@@ -83,7 +83,6 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
       cs.setString(1, authorUsername);
       cs.registerOutParameter(2, OracleTypes.CURSOR);
       cs.execute();
-
       ResultSet rs = (ResultSet) cs.getObject(2);
 
       List<Reimbursement> reimbsByAuthor = new ArrayList<>();
@@ -91,6 +90,47 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
         reimbsByAuthor.add(extractReimb(rs));
       }
       return reimbsByAuthor;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  @Override
+  public List<Reimbursement> findByStatus(String status) {
+    try (Connection c = ConnectionUtil.getConnection()) {
+      CallableStatement cs = c.prepareCall("call get_reimb_by_status(?, ?)");
+      cs.setString(1, status);
+      cs.registerOutParameter(2, OracleTypes.CURSOR);
+      cs.execute();
+      ResultSet rs = (ResultSet) cs.getObject(2);
+
+      List<Reimbursement> reimbsByStatus = new ArrayList<>();
+      while (rs.next()) {
+        reimbsByStatus.add(extractReimb(rs));
+      }
+      return reimbsByStatus;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  @Override
+  public List<Reimbursement> findByAuthorAndStatus(String authorUsername, String status) {
+    try (Connection c = ConnectionUtil.getConnection()) {
+      CallableStatement cs = c.prepareCall("call get_reimb_by_author_and_status(?, ?, ?)");
+      cs.setString(1, authorUsername);
+      cs.setString(2, status);
+      cs.registerOutParameter(3, OracleTypes.CURSOR);
+      cs.execute();
+      ResultSet rs = (ResultSet) cs.getObject(3);
+
+      List<Reimbursement> reimbsByStatus = new ArrayList<>();
+      while (rs.next()) {
+        reimbsByStatus.add(extractReimb(rs));
+      }
+      return reimbsByStatus;
     } catch (SQLException e) {
       e.printStackTrace();
       return null;

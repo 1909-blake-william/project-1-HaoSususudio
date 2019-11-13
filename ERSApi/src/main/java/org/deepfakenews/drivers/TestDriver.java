@@ -11,19 +11,29 @@ public class TestDriver {
     ReimbursementDao reimbDao = ReimbursementDao.currentImplementation;
     UserInfoDao userInfoDao = UserInfoDao.currentImplementation;
 
-//    List<Reimbursement> allReimbs = reimbDao.findAll();
-//    for (Reimbursement each : allReimbs) {
-//      System.out.println(each);
-//    }
+    List<Reimbursement> allReimbs = reimbDao.findAll();
+    for (Reimbursement each : allReimbs) {
+      System.out.println(each);
+    }
 
 //    List<UserInfo> allUserInfo = userInfoDao.findAll();
 //    for (UserInfo each : allUserInfo) {
 //      System.out.println(each);
 //    }
 //
-    List<Reimbursement> reimbsByAuthor = reimbDao.findByAuthorUsername("");
-    for (Reimbursement each : reimbsByAuthor) {
-      System.out.println(each);
-    }
+//    List<Reimbursement> reimbsByAuthor = reimbDao.findByAuthorUsername("chip");
+//    for (Reimbursement each : reimbsByAuthor) {
+//      System.out.println(each);
+//    }
+//
+//    List<Reimbursement> reimbsByStatus = reimbDao.findByStatus("PENDING");
+//    for (Reimbursement each : reimbsByStatus) {
+//      System.out.println(each);
+//    }
+
+//    List<Reimbursement> reimbsByAuthorAndStatus = reimbDao.findByAuthorAndStatus("chip", "PENDING");
+//    for (Reimbursement each : reimbsByAuthorAndStatus) {
+//      System.out.println(each);
+//    }
   }
 }

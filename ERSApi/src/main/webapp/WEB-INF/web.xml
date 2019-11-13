@@ -1,35 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns="http://java.sun.com/xml/ns/javaee"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-	version="2.5">
-	<display-name>DFNERSApi</display-name>
-
-	<servlet>
-		<servlet-name>OurFirstServlet</servlet-name>
-		<servlet-class>org.deepfakenews.servlets.FirstServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>OurFirstServlet</servlet-name>
-		<url-pattern>/first</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>UserServlet</servlet-name>
-		<servlet-class>org.deepfakenews.servlets.UserServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>UserServlet</servlet-name>
-		<url-pattern>/users/*</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>ReimbursementServlet</servlet-name>
-		<servlet-class>org.deepfakenews.servlets.ReimbursementServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>ReimbursementServlet</servlet-name>
-		<url-pattern>/reimbursements/*</url-pattern>
-	</servlet-mapping>
-
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+  <display-name>DFNERSApi</display-name>
+  <servlet>
+    <servlet-name>OurFirstServlet</servlet-name>
+    <servlet-class>org.deepfakenews.servlets.FirstServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>OurFirstServlet</servlet-name>
+    <url-pattern>/first</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>UserServlet</servlet-name>
+    <servlet-class>org.deepfakenews.servlets.UserServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UserServlet</servlet-name>
+    <url-pattern>/users/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>ReimbursementServlet</servlet-name>
+    <servlet-class>org.deepfakenews.servlets.ReimbursementServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ReimbursementServlet</servlet-name>
+    <url-pattern>/reimbursements/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>DispatcherServlet</display-name>
+    <servlet-name>DispatcherServlet</servlet-name>
+    <servlet-class>org.deepfakenews.servlets.DispatcherServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DispatcherServlet</servlet-name>
+    <url-pattern>/DispatcherServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>test</display-name>
+    <servlet-name>test</servlet-name>
+    <servlet-class>org.deepfakenews.servlets.test</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>test</servlet-name>
+    <url-pattern>/test</url-pattern>
+  </servlet-mapping>
 </web-app>
