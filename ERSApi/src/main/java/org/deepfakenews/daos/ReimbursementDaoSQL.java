@@ -71,16 +71,17 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
       }
       return allReimbs;
     } catch (SQLException e) {
-      e.printStackTrace(); 
+      e.printStackTrace();
       return null;
     }
   }
 
   @Override
   public List<Reimbursement> findByAuthorUsername(String authorUsername) {
+    log.debug("Attempting to find Reimbursements by authorUsername from DB");
     try (Connection c = ConnectionUtil.getConnection()) {
       CallableStatement cs = c.prepareCall("call get_reimb_by_author(?, ?)");
-      cs.setString(1, authorUsername);
+      cs.setString(1, authorUsername.toLowerCase());
       cs.registerOutParameter(2, OracleTypes.CURSOR);
       cs.execute();
       ResultSet rs = (ResultSet) cs.getObject(2);
@@ -98,9 +99,10 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
 
   @Override
   public List<Reimbursement> findByStatus(String status) {
+    log.debug("Attempting to find Reimbursements by status from DB");
     try (Connection c = ConnectionUtil.getConnection()) {
       CallableStatement cs = c.prepareCall("call get_reimb_by_status(?, ?)");
-      cs.setString(1, status);
+      cs.setString(1, status.toUpperCase());
       cs.registerOutParameter(2, OracleTypes.CURSOR);
       cs.execute();
       ResultSet rs = (ResultSet) cs.getObject(2);
@@ -118,10 +120,11 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
 
   @Override
   public List<Reimbursement> findByAuthorAndStatus(String authorUsername, String status) {
+    log.debug("Attempting to find Reimbursements by author and status from DB");
     try (Connection c = ConnectionUtil.getConnection()) {
       CallableStatement cs = c.prepareCall("call get_reimb_by_author_and_status(?, ?, ?)");
-      cs.setString(1, authorUsername);
-      cs.setString(2, status);
+      cs.setString(1, authorUsername.toLowerCase());
+      cs.setString(2, status.toUpperCase());
       cs.registerOutParameter(3, OracleTypes.CURSOR);
       cs.execute();
       ResultSet rs = (ResultSet) cs.getObject(3);
