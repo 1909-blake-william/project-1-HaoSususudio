@@ -10,8 +10,8 @@ import java.util.Optional;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
+import org.deepfakenews.daos.UserLoginDao;
 import org.deepfakenews.models.UserLogin;
-
 
 public class AuthUtil {
   public static final AuthUtil instance = new AuthUtil();
@@ -29,7 +29,7 @@ public class AuthUtil {
     }
 
     String key = u.getSecureKey();
-    String salt = u.getSaltForPassword();
+    String salt = u.getSalt();
     if (verifyPassword(password, key, salt)) {
       currentUserLogin = u;
       return u;
@@ -51,14 +51,14 @@ public class AuthUtil {
     }
   }
 
-  public void generateAndSaveNewUserLogin(String username, String password) {
-    String salt = generateSalt().get();
-    String key = hashPassword(password, salt).get();
-    TempObjUtil.userLoginInst.setSaltForPassword(salt);
-    TempObjUtil.userLoginInst.setSecureKey(key);
-    UserLoginDao userDao = UserLoginDao.currentImplementation;
-    userDao.save(TempObjUtil.userLoginInst);
-  }
+//  public void generateAndSaveNewUserLogin(String username, String password) {
+//    String salt = generateSalt().get();
+//    String key = hashPassword(password, salt).get();
+//    TempObjUtil.userLoginInst.setSaltForPassword(salt);
+//    TempObjUtil.userLoginInst.setSecureKey(key);
+//    UserLoginDao userDao = UserLoginDao.currentImplementation;
+//    userDao.save(TempObjUtil.userLoginInst);
+//  }
 
   public boolean ifUserExistsInDB(String username) {
     UserLogin u = userLoginDao.findByUsername(username);

@@ -1,59 +1,59 @@
 package org.deepfakenews.models;
 
 public class UserLogin {
-	private int userId;
-	private String username;
-	private String secureKey;
-	private String salt;
+  private String username;
+  private String secureKey;
+  private String salt;
+  private String role;
 
-	public UserLogin() {
-		super();
-	}
+  public UserLogin() {
+    super();
+  }
 
-	public UserLogin(int userId, String username, String secureKey, String salt) {
-		super();
-		this.userId = userId;
-		this.username = username;
-		this.secureKey = secureKey;
-		this.salt = salt;
-	}
+  public UserLogin(String username, String secureKey, String salt, String role) {
+    super();
+    this.username = username;
+    this.secureKey = secureKey;
+    this.salt = salt;
+    this.role = role;
+  }
 
-	public int getUserId() {
-		return userId;
-	}
+  public String getUsername() {
+    return username;
+  }
 
-	public void setUserId(int userId) {
-		this.userId = userId;
-	}
+  public void setUsername(String username) {
+    this.username = username;
+  }
 
-	public String getUsername() {
-		return username;
-	}
+  public String getSecureKey() {
+    return secureKey;
+  }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+  public void setSecureKey(String secureKey) {
+    this.secureKey = secureKey;
+  }
 
-	public String getSecureKey() {
-		return secureKey;
-	}
+  public String getSalt() {
+    return salt;
+  }
 
-	public void setSecureKey(String secureKey) {
-		this.secureKey = secureKey;
-	}
+  public void setSalt(String salt) {
+    this.salt = salt;
+  }
 
-	public String getSalt() {
-		return salt;
-	}
+  public String getRole() {
+    return role;
+  }
 
-	public void setSalt(String salt) {
-		this.salt = salt;
-	}
+  public void setRole(String role) {
+    this.role = role;
+  }
 
-	@Override
-	public String toString() {
-		return "UserLogin [userId=" + userId + ", username=" + username + ", secureKey=" + secureKey + ", salt=" + salt
-				+ "]";
-	}
+  @Override
+  public String toString() {
+    return "UserLogin [username=" + username + ", secureKey=" + secureKey + ", salt=" + salt
+        + ", role=" + role + "]";
+  }
 
 }

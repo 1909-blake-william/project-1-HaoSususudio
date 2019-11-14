@@ -2,6 +2,7 @@ package org.deepfakenews.servlets;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -9,7 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.deepfakenews.models.UserLogin;
 import org.deepfakenews.models.UsernameAndPW;
+import org.deepfakenews.util.AuthUtil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -17,7 +20,7 @@ public class AuthServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
   private static Logger log = Logger.getRootLogger();
   private static final ObjectMapper objMapper = new ObjectMapper();
-  private static UsernameAndPW providedUNPW = new UsernameAndPW();
+  private static UsernameAndPW inUNPW = new UsernameAndPW();
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -28,10 +31,27 @@ public class AuthServlet extends HttpServlet {
     log.debug("reqUri = " + reqUri);
     BufferedReader reqReader = req.getReader();
 
-    providedUNPW = (UsernameAndPW) objMapper.readValue(reqReader, UsernameAndPW.class);
-    log.debug(providedUNPW);
+    inUNPW = (UsernameAndPW) objMapper.readValue(reqReader, UsernameAndPW.class);
+    log.debug(inUNPW);
+    UserLogin ulogin = AuthUtil.instance.login(inUNPW.getUsername(), inUNPW.getPassword());
+    if (ulogin == null) {
+      resp.setStatus(401); // Unauthorized status code
+      resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      log.debug("login failed");
+      return;
+    } else {
+      resp.setStatus(201);
+      req.getSession().setAttribute("user", ulogin);
+      resp.getWriter().write(objMapper.writeValueAsString(ulogin));
+//      req.getRequestDispatcher("/home.jsp").include(req, resp);
 
+      Enumeration<String> attributes = req.getSession().getAttributeNames();
+      while (attributes.hasMoreElements()) {
+        String attribute = (String) attributes.nextElement();
+        System.out.println(attribute + " : " + req.getSession().getAttribute(attribute));
+      }
 
+    }
 //    log.debug("username = " + providedCreds.getUsername() + ", password = "
 //        + providedCreds.getPassword());
 
