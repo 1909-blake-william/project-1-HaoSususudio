@@ -18,10 +18,11 @@ function login(event) {
     })
         .then(resp => {
             if (resp.status === 201) {
+                console.log(resp.body);
                 // redirect
                 document.getElementById('error-message').innerText = 'Successful login';
                 console.log('navigate to ERS app')
-                // window.location = '/pokemon/view-pokemon/view-pokemon.html';
+                // window.location.assign() = '/client/ERS-employee.html';
             } else {
                 document.getElementById('error-message').innerText = 'Failed to login';
             }

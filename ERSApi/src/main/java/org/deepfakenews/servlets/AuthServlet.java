@@ -2,7 +2,6 @@ package org.deepfakenews.servlets;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -23,6 +22,20 @@ public class AuthServlet extends HttpServlet {
   private static UsernameAndPW inUNPW = new UsernameAndPW();
 
   @Override
+  protected void service(HttpServletRequest req, HttpServletResponse resp)
+      throws ServletException, IOException {
+    System.out.println(req.getRequestURL());
+    resp.addHeader("Access-Control-Allow-Origin", "http://localhost:5500");
+    resp.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, HEAD");
+    resp.addHeader("Access-Control-Allow-Headers",
+        "Origin, Methods, Credentials, X-Requested-With, Content-Type, Accept");
+    resp.addHeader("Access-Control-Allow-Credentials", "true");
+    resp.setContentType("application/json");
+    // TODO Auto-generated method stub
+    super.service(req, resp);
+  }
+
+  @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
@@ -36,45 +49,16 @@ public class AuthServlet extends HttpServlet {
     UserLogin ulogin = AuthUtil.instance.login(inUNPW.getUsername(), inUNPW.getPassword());
     if (ulogin == null) {
       resp.setStatus(401); // Unauthorized status code
-      resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//      resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       log.debug("login failed");
       return;
     } else {
       resp.setStatus(201);
-      req.getSession().setAttribute("user", ulogin);
+      req.getSession().setAttribute("userLogin", ulogin);
       resp.getWriter().write(objMapper.writeValueAsString(ulogin));
-//      req.getRequestDispatcher("/home.jsp").include(req, resp);
-
-      Enumeration<String> attributes = req.getSession().getAttributeNames();
-      while (attributes.hasMoreElements()) {
-        String attribute = (String) attributes.nextElement();
-        System.out.println(attribute + " : " + req.getSession().getAttribute(attribute));
-      }
-
+      Object test = req.getSession().getAttribute("userLogin");
+      log.debug(test);
     }
-//    log.debug("username = " + providedCreds.getUsername() + ", password = "
-//        + providedCreds.getPassword());
-
-//    if ("william".equals(username) && "password".equals(password)) {
-////      objMapper.read
-//      // Session, cookies,
-//      // On a cookie, you specify a name, a value, and path (At least). Cookies are
-//      // stored on the browser,
-//      // and every time the browser send an HTTP request to that path, the cookie will
-//      // be included
-//      req.getSession().setAttribute("currentUser", "william");
-//      req.getSession().setAttribute("age", 26);
-//
-//      // At this point in time, what are you trying to do?
-//      // Go to the home page!
-//      // This is not used in REST API's. Only when using Server Side Rendering (In our
-//      // case, JSP).
-//      req.getRequestDispatcher("/home.jsp").include(req, resp);
-//      return;
-//    } else {
-//      resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//      return;
-//    }
   }
 
 }
