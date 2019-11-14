@@ -3,6 +3,7 @@ package org.deepfakenews.servlets;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.deepfakenews.daos.ReimbursementDao;
 import org.deepfakenews.daos.UserInfoDao;
 
@@ -11,9 +12,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Dispatcher {
   private static UserInfoDao userDao = UserInfoDao.currentImplementation;
   private static ReimbursementDao reimbDao = ReimbursementDao.currentImplementation;
-  private static final String USER_URI = "/DFNERSApi/users";
-  private static final String REIMBURSEMENT_URI = "/DFNERSApi/reimbursements";
+  private static final String USER_URI = "/DFNERSApi/api/users";
+  private static final String REIMBURSEMENT_URI = "/DFNERSApi/api/reimbursements";
   private static ObjectMapper mapper = new ObjectMapper();
+  private static Logger log = Logger.getRootLogger();
 
   public static Object dispatch(HttpServletRequest request, HttpServletResponse response) {
     String httpMethod = request.getMethod();
@@ -21,10 +23,8 @@ public class Dispatcher {
     switch (httpMethod) {
     case "GET":
       return dispatchGET(request, response);
-//      break;
     case "POST":
-      return null;
-//      break;
+      return dispatchPOST(request, response);
     case "PUT":
       return null;
 //      break;
@@ -37,11 +37,27 @@ public class Dispatcher {
   public static Object dispatchGET(HttpServletRequest request, HttpServletResponse response) {
     String reqURI = request.getRequestURI();
     if (reqURI.startsWith(USER_URI)) {
-      return userDao.findAll();
+      log.debug("dispatchGETUse");
+      return dispatchGETUser(request, response);
     } else if (reqURI.startsWith(REIMBURSEMENT_URI)) {
       return dispatchGETReimbursements(request, response);
+    } else {
+      return null;
     }
-    return null;
+  }
+
+  public static Object dispatchGETUser(HttpServletRequest request, HttpServletResponse response) {
+    String username = request.getParameter("username");
+    String userIdStr = request.getParameter("userid");
+    System.out.println(userIdStr);
+    if (username != null) {
+      return userDao.findByUsername(username);
+    } else if (userIdStr != null) {
+      int userId = Integer.valueOf(userIdStr);
+      return userDao.findById(userId);
+    } else {
+      return userDao.findAll();
+    }
   }
 
   public static Object dispatchGETReimbursements(HttpServletRequest request,
@@ -58,6 +74,11 @@ public class Dispatcher {
     } else {
       return reimbDao.findByAuthorAndStatus(authorUsername, reimbStatus);
     }
+  }
+
+  private static Object dispatchPOST(HttpServletRequest request, HttpServletResponse response) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

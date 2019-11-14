@@ -10,4 +10,6 @@ public interface UserInfoDao {
   List<UserInfo> findAll();
 
   UserInfo findById(int userId);
+
+  UserInfo findByUsername(String username);
 }
