@@ -1,4 +1,5 @@
 let currentUser;
+
 function newPokemonSubmit(event) {
   event.preventDefault(); // stop page from refreshing
   console.log('submitted');
@@ -14,46 +15,60 @@ function newPokemonSubmit(event) {
   })
     .then(res => res.json())
     .then(data => {
-      addPokemonToTableSafe(data);
+      addReimbursementToTable(data);
       console.log(data);
     })
     .catch(err => console.log(err));
-
-
 }
 
-function addPokemonToTableSafe(pokemon) {
+function addReimbursementToTable(reimbursement) {
 
   // create the row element
   const row = document.createElement('tr');
 
   // create all the td elements and append them to the row
-  const nameData = document.createElement('td');
-  nameData.innerText = pokemon.name;
-  row.appendChild(nameData);
+  const reimbId = document.createElement('td');
+  reimbId.innerText = reimbursement.reimbId;
+  row.appendChild(reimbId);
 
-  const typeData = document.createElement('td');
-  typeData.innerText = pokemon.type.name;
-  row.appendChild(typeData);
+  const amount = document.createElement('td');
+  amount.innerText = reimbursement.amount;
+  row.appendChild(amount);
 
-  const hpData = document.createElement('td');
-  hpData.innerText = pokemon.healthPoints;
-  row.appendChild(hpData);
+  const submittedTime = document.createElement('td');
+  submittedTime.innerText = reimbursement.submittedTime;
+  row.appendChild(submittedTime);
 
-  const levelData = document.createElement('td');
-  levelData.innerText = pokemon.level;
-  row.appendChild(levelData);
+  const resolvedTime = document.createElement('td');
+  resolvedTime.innerText = reimbursement.resolvedTime;
+  row.appendChild(resolvedTime);
 
-  const trainerData = document.createElement('td');
-  trainerData.innerText = pokemon.trainer.username;
-  row.appendChild(trainerData);
+  const description = document.createElement('td');
+  description.innerText = reimbursement.description;
+  row.appendChild(description);
+
+  const authorId = document.createElement('td');
+  authorId.innerText = reimbursement.authorId;
+  row.appendChild(authorId);
+
+  const resolverId = document.createElement('td');
+  resolverId.innerText = reimbursement.resolverId;
+  row.appendChild(resolverId);
+
+  const status = document.createElement('td');
+  status.innerText = reimbursement.status;
+  row.appendChild(status);
+
+  const type = document.createElement('td');
+  type.innerText = reimbursement.type;
+  row.appendChild(type);
 
   // append the row into the table
-  document.getElementById('pokemon-table-body').appendChild(row);
+  document.getElementById('reimb-table-body').appendChild(row);
 }
 
 function addPokemonToTable(pokemon) {
-  document.getElementById('pokemon-table-body').innerHTML += `
+  document.getElementById('reimb-table-body').innerHTML += `
     <tr>
         <td>${pokemon.name}</td>
         <td>${pokemon.type.name}</td>
@@ -85,10 +100,11 @@ function getPokemonFromInputs() {
 }
 
 function refreshTable() {
-  fetch('http://localhost:8080/PokemonApi/pokemon')
+  fetch('http://localhost:8080/DFNERSApi/api/reimbursements/')
     .then(res => res.json())
     .then(data => {
-      data.forEach(addPokemonToTableSafe)
+      console.log(data)
+      data.forEach(addReimbursementToTable)
     })
     .catch(console.log);
 }
@@ -108,5 +124,6 @@ function getCurrentUserInfo() {
       window.location = '/login/login.html';
     })
 }
+refreshTable()
 
-getCurrentUserInfo();
+// getCurrentUserInfo();

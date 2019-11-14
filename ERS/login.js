@@ -23,10 +23,10 @@ function login(event) {
 
         switch (resp.body.role) {
           case 'EMPLOYEE':
-            window.location.assign('/client/ERS-employee.html');
+            window.location.assign('/ERS-employee.html');
             break;
           case 'MANAGER':
-            window.location.assign('/client/ERS-manager.html');
+            window.location.assign('/ERS-manager.html');
             break;
           default:
             document.getElementById('error-message').innerText = 'Account role undefined. Contact Admin';

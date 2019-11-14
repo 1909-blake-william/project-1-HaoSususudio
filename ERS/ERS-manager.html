@@ -4,7 +4,7 @@
 <head>
   <meta charset='utf-8'>
   <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-  <title>Deep Fake News - Expense Reimbursement System - Employee</title>
+  <title>Deep Fake News - Expense Reimbursement System - Manager</title>
   <meta name='viewport' content='width=device-width, initial-scale=1'>
 
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -17,7 +17,7 @@
 <body>
 
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">Revamon</a>
+    <a class="navbar-brand" href="#">Deep Fake News Expense Reimbursement System</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample05"
       aria-controls="navbarsExample05" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -28,53 +28,25 @@
         <li class="nav-item">
           <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
         </li>
-
-
-
-        </li>
       </ul>
     </div>
   </nav>
-
+  <h1>Reimbursements</h1>
   <table class="table" id="pokemon-table">
     <thead class="thead-dark">
       <tr>
-        <th scope="col">Name</th>
+        <th scope="col">Reimbursement ID</th>
+        <th scope="col">Aount</th>
+        <th scope="col">Submitted Time</th>
+        <th scope="col">Resolved Time</th>
+        <th scope="col">Description</th>
+        <th scope="col">Author ID</th>
+        <th scope="col">Resolver ID</th>
+        <th scope="col">Status</th>
         <th scope="col">Type</th>
-        <th scope="col">HP</th>
-        <th scope="col">Level</th>
-        <th scope="col">Trainer</th>
       </tr>
     </thead>
-    <tbody id="pokemon-table-body">
-      <tr>
-        <td>Nic</td>
-        <td>Ghost</td>
-        <td>50</td>
-        <td>22</td>
-        <td>Nic</td>
-      </tr>
-      <tr>
-        <td>Staryu</td>
-        <td>Water</td>
-        <td>30</td>
-        <td>7</td>
-        <td>Misty</td>
-      </tr>
-      <tr>
-        <td>Dragonite</td>
-        <td>Dragon</td>
-        <td>132</td>
-        <td>55</td>
-        <td>Red</td>
-      </tr>
-      <tr>
-        <td>Sylveon</td>
-        <td>Fairy</td>
-        <td>82</td>
-        <td>21</td>
-        <td>Kris</td>
-      </tr>
+    <tbody id="reimb-table-body"></tbody>
     </tbody>
   </table>
 
@@ -114,6 +86,6 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
   integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
-<script src="view-pokemon.js"></script>
+<script src="ERS.js"></script>
 
 </html>
