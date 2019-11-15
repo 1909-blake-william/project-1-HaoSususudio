@@ -163,28 +163,17 @@ BEGIN
   RETURNING reimb_id INTO generated_id;
 END;
 /
-CREATE OR REPLACE PROCEDURE approve_reimbursement
+CREATE OR REPLACE PROCEDURE update_reimb_status
 (
-  reimb_id_in IN ers_reimbursement.reimb_id%TYPE,
-  reimb_resolver_in IN ers_reimbursement.reimb_resolver%TYPE
+  in_reimb_id IN ers_reimbursement.reimb_id%TYPE,
+  in_reimb_status_id IN ers_reimbursement.reimb_id%TYPE,
+  in_reimb_resolver IN ers_reimbursement.reimb_resolver%TYPE
 )
 AS
 BEGIN
   UPDATE ers_reimbursement
-  SET reimb_resolver = reimb_resolver_in, reimb_resolved = CURRENT_TIMESTAMP, reimb_status_id = 2
-  WHERE reimb_id = reimb_id_in;
-END;
-/
-CREATE OR REPLACE PROCEDURE deny_reimbursement
-(
-  reimb_id_in IN ers_reimbursement.reimb_id%TYPE,
-  reimb_resolver_in IN ers_reimbursement.reimb_resolver%TYPE
-)
-AS
-BEGIN
-  UPDATE ers_reimbursement
-  SET reimb_resolver = reimb_resolver_in, reimb_resolved = CURRENT_TIMESTAMP, reimb_status_id = 3
-  WHERE reimb_id = reimb_id_in;
+  SET reimb_resolver = in_reimb_resolver, reimb_resolved = CURRENT_TIMESTAMP, reimb_status_id = in_reimb_status_id
+  WHERE reimb_id = in_reimb_id;
 END;
 /
 -------------------FUNCTIONS FOR DATA QUERRY-------------------------
@@ -201,6 +190,23 @@ BEGIN
   LEFT JOIN ers_reimbursement_status sta ON (reimb.reimb_status_id = sta.reimb_status_id)
   LEFT JOIN ers_reimbursement_type rtype ON (reimb.reimb_type_id = rtype.reimb_type_id)
   ORDER BY reimb.reimb_id;
+END;
+/
+CREATE OR REPLACE PROCEDURE get_reimb_by_id
+(
+  in_reimb_id IN int,
+  out_cursor_reimb OUT SYS_REFCURSOR
+)
+AS
+BEGIN
+  OPEN out_cursor_reimb FOR
+  SELECT  reimb.reimb_id, reimb.reimb_amount, reimb.reimb_submitted, reimb.reimb_resolved, reimb.reimb_description,
+    reimb.reimb_author, reimb.reimb_resolver, sta.reimb_status, rtype.reimb_type
+  FROM ers_reimbursement reimb
+  LEFT JOIN ers_reimbursement_status sta ON (reimb.reimb_status_id = sta.reimb_status_id)
+  LEFT JOIN ers_reimbursement_type rtype ON (reimb.reimb_type_id = rtype.reimb_type_id)
+  LEFT JOIN ers_users author ON (reimb.reimb_author = author.ers_users_id)
+  WHERE reimb.reimb_id = in_reimb_id;
 END;
 /
 CREATE OR REPLACE PROCEDURE get_reimb_by_author
@@ -368,11 +374,11 @@ BEGIN
   UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('21-Oct-19 11:33:56.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 8;
   UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('05-Nov-19 12:20:05.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 9;
   UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('07-Nov-19 09:10:55.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 10;
-  approve_reimbursement(1,1);
-  approve_reimbursement(2,1);
-  deny_reimbursement(3,1);
-  approve_reimbursement(6,1);
-  deny_reimbursement(7,1);
+  update_reimb_status(1, 2, 1);
+  update_reimb_status(2, 2, 1);
+  update_reimb_status(3, 3, 1);
+  update_reimb_status(6, 2, 1);
+  update_reimb_status(7, 3, 1);
   UPDATE ers_reimbursement SET reimb_resolved = TO_TIMESTAMP ('13-Oct-19 09:23:11.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 1;
   UPDATE ers_reimbursement SET reimb_resolved = TO_TIMESTAMP ('13-Oct-19 09:24:45.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 2;
   UPDATE ers_reimbursement SET reimb_resolved = TO_TIMESTAMP ('13-Oct-19 09:29:55.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 3;

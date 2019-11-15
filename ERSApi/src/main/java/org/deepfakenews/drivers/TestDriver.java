@@ -1,7 +1,5 @@
 package org.deepfakenews.drivers;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.deepfakenews.daos.ReimbursementDao;
 import org.deepfakenews.daos.UserInfoDao;
@@ -16,10 +14,10 @@ public class TestDriver {
     ReimbursementDao reimbDao = ReimbursementDao.currentImplementation;
     UserInfoDao userInfoDao = UserInfoDao.currentImplementation;
     UserLoginDao userLoginDao = UserLoginDao.currentImplementation;
-    List<Reimbursement> allReimbs = reimbDao.findAll();
-    for (Reimbursement each : allReimbs) {
-      System.out.println(each);
-    }
+//    List<Reimbursement> allReimbs = reimbDao.findAll();
+//    for (Reimbursement each : allReimbs) {
+//      System.out.println(each);
+//    }
 
 //    List<UserInfo> allUserInfo = userInfoDao.findAll();
 //    for (UserInfo each : allUserInfo) {
@@ -43,5 +41,8 @@ public class TestDriver {
 
     UserLogin uLogin = userLoginDao.findByUsername("chip");
     log.debug(uLogin);
+    Reimbursement reimb = ReimbursementDao.currentImplementation.findById(2);
+    System.out.println(reimb);
+    System.out.println(ReimbursementDao.currentImplementation.updateStatus(2, 1, 1));
   }
 }

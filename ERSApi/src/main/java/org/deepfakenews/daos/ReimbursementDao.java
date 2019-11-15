@@ -9,9 +9,7 @@ public interface ReimbursementDao {
 
   int requestNew(Reimbursement reimb);
 
-  void approve(int reimbId, int resolverId);
-
-  void deny(int reimbId, int resolverId);
+  Reimbursement updateStatus(int reimbId, int statusId, int resolverId);
 
   Reimbursement findById(int reimbId);
 

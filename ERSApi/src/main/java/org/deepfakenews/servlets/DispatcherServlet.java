@@ -22,14 +22,12 @@ public class DispatcherServlet extends HttpServlet {
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-    System.out.println(req.getRequestURL());
     resp.addHeader("Access-Control-Allow-Origin", "http://localhost:5500");
-    resp.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, HEAD");
+    resp.addHeader("Access-Control-Allow-Methods", "POST, GET, PUT");
     resp.addHeader("Access-Control-Allow-Headers",
         "Origin, Methods, Credentials, X-Requested-With, Content-Type, Accept");
     resp.addHeader("Access-Control-Allow-Credentials", "true");
     resp.setContentType("application/json");
-    // TODO Auto-generated method stub
     super.service(req, resp);
   }
 
@@ -47,7 +45,7 @@ public class DispatcherServlet extends HttpServlet {
             .writeValueAsBytes(Collections.singletonMap("error", "Failed to write JSON in doGet")));
       }
     } else {
-      // Return some 4XX error
+      resp.setStatus(400);
     }
   }
 
@@ -67,7 +65,27 @@ public class DispatcherServlet extends HttpServlet {
             Collections.singletonMap("error", "Failed to write Failed to write JSON in doPost")));
       }
     } else {
-      // Return some 4XX error
+      resp.setStatus(400);
+    }
+  }
+
+  @Override
+  protected void doPut(HttpServletRequest req, HttpServletResponse resp)
+      throws ServletException, IOException {
+    resp.setContentType("application/json");
+
+    Object response = Dispatcher.dispatch(req, resp);
+    if (response != null) {
+
+      try {
+        resp.getOutputStream().write(mapper.writeValueAsBytes(response));
+      } catch (IOException e) {
+
+        resp.getOutputStream().write(mapper.writeValueAsBytes(
+            Collections.singletonMap("error", "Failed to write Failed to write JSON in doPut")));
+      }
+    } else {
+      resp.setStatus(400);
     }
   }
 }

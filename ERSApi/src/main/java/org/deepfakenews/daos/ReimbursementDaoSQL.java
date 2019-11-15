@@ -35,24 +35,29 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
 
   @Override
   public int requestNew(Reimbursement reimb) {
-    // TODO Auto-generated method stub
+
     return 0;
   }
 
   @Override
-  public void approve(int reimbId, int resolverId) {
-    // TODO Auto-generated method stub
-  }
-
-  @Override
-  public void deny(int reimbId, int resolverId) {
-    // TODO Auto-generated method stub
-  }
-
-  @Override
   public Reimbursement findById(int reimbId) {
+    log.debug("Attempting to find Reimbursement by reimbId = " + reimbId);
+    try (Connection c = ConnectionUtil.getConnection()) {
+      CallableStatement cs = c.prepareCall("call get_reimb_by_id(?, ?)");
+      cs.setInt(1, reimbId);
+      cs.registerOutParameter(2, OracleTypes.CURSOR);
+      cs.execute();
+      ResultSet rs = (ResultSet) cs.getObject(2);
 
-    return null;
+      if (rs.next()) {
+        return extractReimb(rs);
+      } else {
+        return null;
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return null;
+    }
   }
 
   @Override
@@ -134,6 +139,34 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
         reimbsByStatus.add(extractReimb(rs));
       }
       return reimbsByStatus;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  @Override
+  public Reimbursement updateStatus(int reimbId, int statusId, int resolverId) {
+    log.debug("Attempting to update reimbursements status in DB");
+    try (Connection c = ConnectionUtil.getConnection()) {
+      CallableStatement cs = c.prepareCall("call update_reimb_status(?, ?, ?)");
+      cs.setInt(1, reimbId);
+      cs.setInt(2, statusId);
+      cs.setInt(3, statusId);
+      cs.execute();
+
+      cs = c.prepareCall("call get_reimb_by_id(?, ?)");
+      cs.setInt(1, reimbId);
+      cs.registerOutParameter(2, OracleTypes.CURSOR);
+      cs.execute();
+      ResultSet rs = (ResultSet) cs.getObject(2);
+
+      if (rs.next()) {
+        return extractReimb(rs);
+      } else {
+        return null;
+      }
+
     } catch (SQLException e) {
       e.printStackTrace();
       return null;

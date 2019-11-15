@@ -1,4 +1,32 @@
 let currentUser;
+getCurrentUserInfo();
+
+function getCurrentUserInfo() {
+  fetch('http://localhost:8080/DFNERSApi/auth/session-user', {
+    credentials: 'include'
+  })
+    .then(resp => resp.json())
+    .then(data => {
+      currentUser = data;
+      if (currentUser.userRole === 'EMPLOYEE') {
+        console.log(currentUser.userRole);
+        // fetchAndAppendAllReimb();
+      } else if (currentUser.userRole === 'MANAGER') {
+        console.log(currentUser.userRole);
+        // fetchAndAppendAllReimb();
+      } else {
+        alert('Account role undefined. Contact Admin');
+        window.location.assign('/index.html');
+      }
+      console.log(currentUser);
+    })
+    .catch(err => {
+      console.log('error');
+      window.location.assign('/index.html');
+    })
+}
+
+
 
 function newPokemonSubmit(event) {
   event.preventDefault(); // stop page from refreshing
@@ -91,40 +119,13 @@ function addReimbursementToTable(reimbursement) {
   document.getElementById('reimb-table-body').appendChild(row);
 }
 
-function getPokemonFromInputs() {
-  const pokemonName = document.getElementById('pokemon-name-input').value;
-  const pokemonHp = document.getElementById('pokemon-hp-input').value;
-  const pokemonLevel = document.getElementById('pokemon-level-input').value;
-  const pokemonType = document.getElementById('pokemon-type-select').value;
-
-  const pokemon = {
-    name: pokemonName,
-    healthPoints: pokemonHp,
-    level: pokemonLevel,
-    type: {
-      id: 5, // should probably find a way to get the correct id
-      name: pokemonType
-    },
-    trainer: currentUser
-  }
-  return pokemon;
+function setupEmployeeMode(){
+  
 }
 
 
+function setupManagerMode(){
 
-function getCurrentUserInfo() {
-  fetch('http://localhost:8080/PokemonApi/auth/session-user', {
-    credentials: 'include'
-  })
-    .then(resp => resp.json())
-    .then(data => {
-      document.getElementById('users-name').innerText = data.username
-      fetchAndAppendAllReimb();
-      currentUser = data;
-    })
-    .catch(err => {
-      window.location = '/login/login.html';
-    })
 }
 
 function fetchAndAppendAllReimb() {
@@ -146,6 +147,8 @@ function whateverStatusId() {
     return 3;
   }
 }
+
+
 
 function refreshAllReimbs() {
   removeAllReimbs();
@@ -171,6 +174,4 @@ function unixTimetoDateTime(unixTimestamp) {
   return Date(unixTimestamp * 1000);
 }
 
-fetchAndAppendAllReimb();
 
-// getCurrentUserInfo();

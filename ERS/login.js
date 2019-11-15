@@ -8,7 +8,7 @@ function login(event) {
     password
   };
 
-  fetch('http://localhost:8080/DFNERSApi/login', {
+  fetch('http://localhost:8080/DFNERSApi/auth/login', {
     method: 'POST',
     headers: {
       'content-type': 'application/json'
@@ -20,18 +20,9 @@ function login(event) {
     .then(resp => {
       if (resp.status === 201) {
         document.getElementById('error-message').innerText = 'Successful login';
-
-        switch (resp.body.role) {
-          case 'EMPLOYEE':
-            window.location.assign('/ERS-employee.html');
-            break;
-          case 'MANAGER':
-            window.location.assign('/ERS-manager.html');
-            break;
-          default:
-            document.getElementById('error-message').innerText = 'Account role undefined. Contact Admin';
-        }
-      } else {
+        window.location.assign('/DFNERS.html');
+      }
+      else {
         document.getElementById('error-message').innerText = 'Failed to login';
       }
     })

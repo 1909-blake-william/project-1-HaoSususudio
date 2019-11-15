@@ -26,7 +26,7 @@ public class Dispatcher {
     case "POST":
       return dispatchPOST(request, response);
     case "PUT":
-      return null;
+      return dispatchPUT(request, response);
 //      break;
     default:
       return null;
@@ -49,7 +49,7 @@ public class Dispatcher {
   public static Object dispatchGETUser(HttpServletRequest request, HttpServletResponse response) {
     String username = request.getParameter("username");
     String userIdStr = request.getParameter("userid");
-    System.out.println(userIdStr);
+    log.debug(userIdStr);
     if (username != null) {
       return userDao.findByUsername(username);
     } else if (userIdStr != null) {
@@ -64,7 +64,7 @@ public class Dispatcher {
       HttpServletResponse response) {
     String authorUsername = request.getParameter("author");
     String reimbStatus = request.getParameter("status");
-    System.out.println(authorUsername + "  " + reimbStatus);
+    log.debug(authorUsername + "  " + reimbStatus);
     if (authorUsername == null && reimbStatus == null) {
       return reimbDao.findAll();
     } else if (reimbStatus == null) {
@@ -79,6 +79,26 @@ public class Dispatcher {
   private static Object dispatchPOST(HttpServletRequest request, HttpServletResponse response) {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  private static Object dispatchPUT(HttpServletRequest request, HttpServletResponse response) {
+    String reqURI = request.getRequestURI();
+    if (reqURI.startsWith(REIMBURSEMENT_URI)) {
+      log.debug("dispatch PUT on reimbursement");
+      return dispatchPUTReimbursements(request, response);
+    } else {
+      return null;
+    }
+  }
+
+  public static Object dispatchPUTReimbursements(HttpServletRequest request,
+      HttpServletResponse response) {
+    log.debug("dispatch PUT on reimbursement");
+    Integer reimbId = Integer.valueOf(request.getParameter("reimbId"));
+    Integer statusId = Integer.valueOf(request.getParameter("statusId"));
+    Integer resolverId = Integer.valueOf(request.getParameter("resolverId"));
+    log.debug(reimbId + "  " + statusId + " " + resolverId);
+    return reimbDao.updateStatus(reimbId, statusId, resolverId);
   }
 
 }
