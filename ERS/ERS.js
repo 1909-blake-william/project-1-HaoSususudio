@@ -10,23 +10,62 @@ function getCurrentUserInfo() {
       currentUser = data;
       if (currentUser.userRole === 'EMPLOYEE') {
         console.log(currentUser.userRole);
-        // fetchAndAppendAllReimb();
+
+
       } else if (currentUser.userRole === 'MANAGER') {
         console.log(currentUser.userRole);
-        // fetchAndAppendAllReimb();
+        setupManagerMode();
+        // fetchAndAppendAllReimb();z
       } else {
-        alert('Account role undefined. Contact Admin');
-        window.location.assign('/index.html');
+        // alert('Account role undefined. Contact Admin');
+        // window.location.assign('/index.html');
       }
-      console.log(currentUser);
     })
     .catch(err => {
-      console.log('error');
-      window.location.assign('/index.html');
+      // console.log('error');
+      // window.location.assign('/index.html');
     })
 }
 
 
+function setupManagerMode() {
+  document.getElementById('page-heading').innerText = 'Reimbursements - Manager Mode';
+
+  let refreshButton = document.createElement('button');
+  refreshButton.innerText = 'Refresh All';
+  refreshButton.className = 'btn btn-primary btn-lg';
+  refreshButton.onclick = refreshAllReimbs;
+  document.getElementById('page-bottom').appendChild(refreshButton);
+}
+
+
+
+// document.getElementById('page-heading').innerText = 'Reimbursements - Manager Mode';
+// let actionsTh = document.createElement('th');
+// actionsTh.scope = 'col';
+// actionsTh.innerText = 'Actions';
+// // document.getElementById('reimb-header-row').appendChild(actionsTh);
+// console.log('here');
+// const refreshAllButton = document.createElement('button');
+// refreshAllButton.class = 'btn btn-primary btn-lg';
+// refreshAllButton.onclick = refreshAllReimbs;
+// console.log(document.getElementsById('bottom-buttons'));
+// document.getElementsById('bottom-buttons').appendChild(refreshAllButton);
+// // fetchAndAppendAllReimb();
+// console.log('here2');
+
+
+
+function setupEmployeeMode() {
+}
+function fetchAndAppendAllReimb() {
+  fetch('http://localhost:8080/DFNERSApi/api/reimbursements/')
+    .then(res => res.json())
+    .then(data => {
+      data.forEach(addReimbursementToTable)
+    })
+    .catch(console.log);
+}
 
 function newPokemonSubmit(event) {
   event.preventDefault(); // stop page from refreshing
@@ -119,23 +158,6 @@ function addReimbursementToTable(reimbursement) {
   document.getElementById('reimb-table-body').appendChild(row);
 }
 
-function setupEmployeeMode(){
-  
-}
-
-
-function setupManagerMode(){
-
-}
-
-function fetchAndAppendAllReimb() {
-  fetch('http://localhost:8080/DFNERSApi/api/reimbursements/')
-    .then(res => res.json())
-    .then(data => {
-      data.forEach(addReimbursementToTable)
-    })
-    .catch(console.log);
-}
 
 function whateverStatusId() {
   let rnd = Math.random();
@@ -147,7 +169,6 @@ function whateverStatusId() {
     return 3;
   }
 }
-
 
 
 function refreshAllReimbs() {
@@ -170,7 +191,6 @@ function unixTimetoDateTime(unixTimestamp) {
   if (!unixTimestamp) {
     return null;
   }
-
   return Date(unixTimestamp * 1000);
 }
 

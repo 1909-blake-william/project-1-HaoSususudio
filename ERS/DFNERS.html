@@ -4,7 +4,7 @@
 <head>
   <meta charset='utf-8'>
   <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-  <title>Deep Fake News - Expense Reimbursement System</title>
+  <title>Deep Fake News - Expense Reimbursement System - Employee</title>
   <meta name='viewport' content='width=device-width, initial-scale=1'>
 
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -17,25 +17,17 @@
 <body>
 
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">Deep Fake News Expense Reimbursement System</a>
+    <a class="navbar-brand" href="#">Revamon</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample05"
       aria-controls="navbarsExample05" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-
-    <div class="collapse navbar-collapse" id="navbarsExample05">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item">
-          <a class="nav-link" >BETA<span class="sr-only">(current)</span></a>
-        </li>
-      </ul>
-    </div>
   </nav>
 
-  <h1>Reimbursements</h1>
-  <table class="table" id="pokemon-table">
+  <h1 id="page-heading">Reimbursements</h1>
+  <table class="table" id="reimbursement-table">
     <thead class="thead-dark">
-      <tr>
+      <tr id='reimb-header-row'>
         <th scope="col">ID</th>
         <th scope="col">Aount</th>
         <th scope="col">Submitted Time</th>
@@ -45,20 +37,14 @@
         <th scope="col">Resolver ID</th>
         <th scope="col">Status</th>
         <th scope="col">Type</th>
-        <th scope="col">Actions</th>
       </tr>
     </thead>
     <tbody id="reimb-table-body"></tbody>
-
-    </tbody>
-
   </table>
 
-  <button class="btn btn-primary btn-lg" onclick="refreshAllReimbs()">Refresh All</button>
 
-
-
-
+  <div id="page-bottom">
+  </div>
 </body>
 <!-- JS -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
