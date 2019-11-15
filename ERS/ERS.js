@@ -25,6 +25,8 @@ function addReimbursementToTable(reimbursement) {
 
   // create the row element
   const row = document.createElement('tr');
+  row.id = `${reimbursement.reimbId}`;
+  row.className = 'reimbursement';
 
   // create all the td elements and append them to the row
   const reimbId = document.createElement('td');
@@ -36,11 +38,11 @@ function addReimbursementToTable(reimbursement) {
   row.appendChild(amount);
 
   const submittedTime = document.createElement('td');
-  submittedTime.innerText = reimbursement.submittedTime;
+  submittedTime.innerText = unixTimetoDateTime(reimbursement.submittedTime);
   row.appendChild(submittedTime);
 
   const resolvedTime = document.createElement('td');
-  resolvedTime.innerText = reimbursement.resolvedTime;
+  resolvedTime.innerText = unixTimetoDateTime(reimbursement.resolvedTime);
   row.appendChild(resolvedTime);
 
   const description = document.createElement('td');
@@ -63,22 +65,31 @@ function addReimbursementToTable(reimbursement) {
   type.innerText = reimbursement.type;
   row.appendChild(type);
 
+  const managerButtonContainer = document.createElement('td');
+  const approveButton = document.createElement('button');
+  const denyButton = document.createElement('button');
+  const whateverButton = document.createElement('button');
+
+  approveButton.innerText = 'Approve';
+  approveButton.className = 'btn btn-success';
+  approveButton.onclick = function () { updateReimbStatus(row.id, 2) };
+
+  denyButton.innerText = 'Deny';
+  denyButton.className = 'btn btn-danger';
+  denyButton.onclick = function () { updateReimbStatus(row.id, 3) };
+
+  whateverButton.innerText = 'WHATEVER';
+  whateverButton.className = 'btn btn-info';
+  whateverButton.onclick = function () { updateReimbStatus(row.id, whateverStatusId()) };
+
+  managerButtonContainer.appendChild(approveButton);
+  managerButtonContainer.appendChild(denyButton);
+  managerButtonContainer.appendChild(whateverButton);
+  row.appendChild(managerButtonContainer);
+
   // append the row into the table
   document.getElementById('reimb-table-body').appendChild(row);
 }
-
-function addPokemonToTable(pokemon) {
-  document.getElementById('reimb-table-body').innerHTML += `
-    <tr>
-        <td>${pokemon.name}</td>
-        <td>${pokemon.type.name}</td>
-        <td>${pokemon.healthPoints}</td>
-        <td>${pokemon.level}</td>
-        <td>${pokemon.trainer.username}</td>
-    </tr>
-    `;
-}
-
 
 function getPokemonFromInputs() {
   const pokemonName = document.getElementById('pokemon-name-input').value;
@@ -99,15 +110,6 @@ function getPokemonFromInputs() {
   return pokemon;
 }
 
-function refreshTable() {
-  fetch('http://localhost:8080/DFNERSApi/api/reimbursements/')
-    .then(res => res.json())
-    .then(data => {
-      console.log(data)
-      data.forEach(addReimbursementToTable)
-    })
-    .catch(console.log);
-}
 
 
 function getCurrentUserInfo() {
@@ -117,13 +119,58 @@ function getCurrentUserInfo() {
     .then(resp => resp.json())
     .then(data => {
       document.getElementById('users-name').innerText = data.username
-      refreshTable();
+      fetchAndAppendAllReimb();
       currentUser = data;
     })
     .catch(err => {
       window.location = '/login/login.html';
     })
 }
-refreshTable()
+
+function fetchAndAppendAllReimb() {
+  fetch('http://localhost:8080/DFNERSApi/api/reimbursements/')
+    .then(res => res.json())
+    .then(data => {
+      data.forEach(addReimbursementToTable)
+    })
+    .catch(console.log);
+}
+
+function whateverStatusId() {
+  let rnd = Math.random();
+  if (rnd <= 0.1) {
+    return 1;
+  } else if (0.1 < rnd && rnd <= 0.7) {
+    return 2;
+  } else if (0.7 < rnd) {
+    return 3;
+  }
+}
+
+function refreshAllReimbs() {
+  removeAllReimbs();
+  fetchAndAppendAllReimb();
+}
+
+function removeAllReimbs() {
+  document.querySelectorAll('tr.reimbursement')
+    .forEach(ele => {
+      ele.remove();
+    })
+}
+
+function updateReimbStatus(reimbId, newStatusId) {
+  console.log(reimbId, newStatusId);
+}
+
+function unixTimetoDateTime(unixTimestamp) {
+  if (!unixTimestamp) {
+    return null;
+  }
+
+  return Date(unixTimestamp * 1000);
+}
+
+fetchAndAppendAllReimb();
 
 // getCurrentUserInfo();

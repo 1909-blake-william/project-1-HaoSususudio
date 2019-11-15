@@ -196,16 +196,65 @@ AS
 BEGIN
   OPEN out_cursor_reimb FOR
   SELECT  reimb.reimb_id, reimb.reimb_amount, reimb.reimb_submitted, reimb.reimb_resolved, reimb.reimb_description,
-    author.ers_users_id, author.user_first_name, author.user_last_name, author.user_email, a_role.user_role,
-    resolver.ers_users_id, resolver.user_first_name, resolver.user_last_name, resolver.user_email, r_role.user_role,
-    sta.reimb_status, rtype.reimb_type
+    reimb.reimb_author, reimb.reimb_resolver, sta.reimb_status, rtype.reimb_type
   FROM ers_reimbursement reimb
-  LEFT JOIN ers_users author ON (reimb.reimb_author = author.ers_users_id)
-  LEFT JOIN ers_user_roles a_role ON (author.user_role_id = a_role.ers_user_role_id)
-  LEFT JOIN ers_users resolver ON (reimb.reimb_resolver = resolver.ers_users_id)
-  LEFT JOIN ers_user_roles r_role ON (resolver.user_role_id = r_role.ers_user_role_id)
   LEFT JOIN ers_reimbursement_status sta ON (reimb.reimb_status_id = sta.reimb_status_id)
   LEFT JOIN ers_reimbursement_type rtype ON (reimb.reimb_type_id = rtype.reimb_type_id)
+  ORDER BY reimb.reimb_id;
+END;
+/
+CREATE OR REPLACE PROCEDURE get_reimb_by_author
+(
+  in_author_username IN varchar2,
+  out_cursor_reimb OUT SYS_REFCURSOR
+)
+AS
+BEGIN
+  OPEN out_cursor_reimb FOR
+  SELECT  reimb.reimb_id, reimb.reimb_amount, reimb.reimb_submitted, reimb.reimb_resolved, reimb.reimb_description,
+    reimb.reimb_author, reimb.reimb_resolver, sta.reimb_status, rtype.reimb_type
+  FROM ers_reimbursement reimb
+  LEFT JOIN ers_reimbursement_status sta ON (reimb.reimb_status_id = sta.reimb_status_id)
+  LEFT JOIN ers_reimbursement_type rtype ON (reimb.reimb_type_id = rtype.reimb_type_id)
+  LEFT JOIN ers_users author ON (reimb.reimb_author = author.ers_users_id)
+  WHERE author.ers_username = in_author_username
+  ORDER BY reimb.reimb_id;
+END;
+/
+CREATE OR REPLACE PROCEDURE get_reimb_by_status
+(
+  in_reimb_status IN varchar2,
+  out_cursor_reimb OUT SYS_REFCURSOR
+)
+AS
+BEGIN
+  OPEN out_cursor_reimb FOR
+  SELECT  reimb.reimb_id, reimb.reimb_amount, reimb.reimb_submitted, reimb.reimb_resolved, reimb.reimb_description,
+    reimb.reimb_author, reimb.reimb_resolver, sta.reimb_status, rtype.reimb_type
+  FROM ers_reimbursement reimb
+  LEFT JOIN ers_reimbursement_status sta ON (reimb.reimb_status_id = sta.reimb_status_id)
+  LEFT JOIN ers_reimbursement_type rtype ON (reimb.reimb_type_id = rtype.reimb_type_id)
+  LEFT JOIN ers_users author ON (reimb.reimb_author = author.ers_users_id)
+  WHERE sta.reimb_status = in_reimb_status
+  ORDER BY reimb.reimb_id;
+END;
+/
+CREATE OR REPLACE PROCEDURE get_reimb_by_author_and_status
+(
+  in_author_username IN varchar2,
+  in_reimb_status IN varchar2,
+  out_cursor_reimb OUT SYS_REFCURSOR
+)
+AS
+BEGIN
+  OPEN out_cursor_reimb FOR
+  SELECT  reimb.reimb_id, reimb.reimb_amount, reimb.reimb_submitted, reimb.reimb_resolved, reimb.reimb_description,
+    reimb.reimb_author, reimb.reimb_resolver, sta.reimb_status, rtype.reimb_type
+  FROM ers_reimbursement reimb
+  LEFT JOIN ers_reimbursement_status sta ON (reimb.reimb_status_id = sta.reimb_status_id)
+  LEFT JOIN ers_reimbursement_type rtype ON (reimb.reimb_type_id = rtype.reimb_type_id)
+  LEFT JOIN ers_users author ON (reimb.reimb_author = author.ers_users_id)
+  WHERE author.ers_username = in_author_username AND sta.reimb_status = in_reimb_status
   ORDER BY reimb.reimb_id;
 END;
 /
@@ -216,53 +265,56 @@ CREATE OR REPLACE PROCEDURE get_all_user_info
 AS
 BEGIN
   OPEN out_cursor_user_info FOR
-  SELECT ers_users_id, user_first_name, user_last_name, user_email, u_role.user_role
+  SELECT ers_users_id, ers_username, user_first_name, user_last_name, user_email, u_role.user_role
   FROM ers_users u
   LEFT JOIN ers_user_roles u_role ON (u.user_role_id = u_role.ers_user_role_id)
   ORDER BY u.ers_users_id;
 END;
 /
-
-
-
-
-
-SET SERVEROUTPUT ON
-DECLARE c_out sys_refcursor;
-  reimb_id number;
-  reimb_amount number;
-  reimb_submitted timestamp;
-  reimb_resolved timestamp;
-  reimb_description varchar2;
-  author_id number;
-  author_first_name varchar2;
-  author_last_name varchar2;
-  author_email varchar2; 
-  a_role varchar2;
-  resolver_id number;
-  resolver_first_name varchar2;
-  resolver_last_name varchar2;
-  resolver_email varchar2;
-  r_role varchar2;
-  reimb_status varchar2;
-  reimb_type varchar2;
+CREATE OR REPLACE PROCEDURE get_user_info_by_username
+(
+  in_username IN varchar2,
+  out_cursor_user_info OUT SYS_REFCURSOR
+)
+AS
 BEGIN
-    get_all_reimbursements(c_out);
-  --   LOOP 
-  --       FETCH c_out
-  --       INTO  reimb_id, reimb_amount, reimb_submitted, reimb_resolved, reimb_description,
-  --         author_id, author_first_name, author_last_name, author_email, a_role,
-  --         resolver_id, resolver_first_name, resolver_last_name, resolver_email, r_role,
-  --         reimb_status, reimb_type;
-  --       EXIT WHEN c_out%NOTFOUND;
-  --       DBMS_OUTPUT.PUT_LINE(reimb_id || ' ' || author_id || ' ' || resolver_id || ' ' || reimb_status);
-  --   END LOOP;
-  -- CLOSE c_out;
+  OPEN out_cursor_user_info FOR
+  SELECT ers_users_id, ers_username, user_first_name, user_last_name, user_email, u_role.user_role
+  FROM ers_users u
+  LEFT JOIN ers_user_roles u_role ON (u.user_role_id = u_role.ers_user_role_id)
+  WHERE u.ers_username = in_username
+  ORDER BY u.ers_users_id;
 END;
 /
-
-
-
+CREATE OR REPLACE PROCEDURE get_user_info_by_userid
+(
+  in_userid IN number,
+  out_cursor_user_info OUT SYS_REFCURSOR
+)
+AS
+BEGIN
+  OPEN out_cursor_user_info FOR
+  SELECT ers_users_id, ers_username, user_first_name, user_last_name, user_email, u_role.user_role
+  FROM ers_users u
+  LEFT JOIN ers_user_roles u_role ON (u.user_role_id = u_role.ers_user_role_id)
+  WHERE u.ers_users_id = in_userid
+  ORDER BY u.ers_users_id;
+END;
+/
+CREATE OR REPLACE PROCEDURE get_user_login_by_username
+(
+  in_username IN varchar2,
+  out_cursor_user_info OUT SYS_REFCURSOR
+)
+AS
+BEGIN
+  OPEN out_cursor_user_info FOR
+  SELECT u.ers_username, u.ers_secure_key, u.ers_salt, u_role.user_role
+  FROM ers_users u
+  LEFT JOIN ers_user_roles u_role ON (u.user_role_id = u_role.ers_user_role_id)
+  WHERE u.ers_username = in_username;
+END;
+/
 --------------------REFRENCE TABLES DATA INSERTION------------------
 INSERT INTO ers_reimbursement_type(reimb_type)
 VALUES('LODGING');
@@ -294,7 +346,7 @@ BEGIN
     'Dale', 'Rednose', 'daletherednosechipmunk@chippendales.com', 2, gen_id);
   new_ers_user('pluto', '9GWplpIvllyQQAy4CiUgWg==', 'z8l6xGh2lRNF6+68jp5gzA==',
     'Pluto', 'Bonedigger', 'pluto@disney.com', 2, gen_id);
-  new_ers_user('whinnie', 'gY5npUOBFZ3GnfS6VX7nIQ==','tyWhPi0AbTfNERQzKeRqcQ==',
+  new_ers_user('winnie', 'gY5npUOBFZ3GnfS6VX7nIQ==','tyWhPi0AbTfNERQzKeRqcQ==',
     'Winnie', 'Xi', 'wxjp@163.com', 2, gen_id);
   request_new_reimbursement(102.53, 'Embassy Inn in Washington DC', 2, 1, gen_id);
   request_new_reimbursement(336.78, 'Plane Tickets to Charlotte, NC', 2, 2, gen_id);
@@ -330,25 +382,9 @@ END;
 /
 COMMIT;
 
-
--- SELECT  reimb.reimb_id, reimb.reimb_amount, reimb.reimb_submitted, reimb.reimb_resolved, reimb.reimb_description,
---   author.ers_users_id, author.ers_username, author.user_first_name, author.user_last_name, author.user_email, a_role.user_role,
---   resolver.ers_users_id, resolver.ers_username, resolver.user_first_name, resolver.user_last_name, resolver.user_email, r_role.user_role,
---   sta.reimb_status, rtype.reimb_type
--- FROM ers_reimbursement reimb
--- LEFT JOIN ers_users author ON (reimb.reimb_author = author.ers_users_id)
--- LEFT JOIN ers_user_roles a_role ON (author.user_role_id = a_role.ers_user_role_id)
--- LEFT JOIN ers_users resolver ON (reimb.reimb_resolver = resolver.ers_users_id)
--- LEFT JOIN ers_user_roles r_role ON (resolver.user_role_id = r_role.ers_user_role_id)
--- LEFT JOIN ers_reimbursement_status sta ON (reimb.reimb_status_id = sta.reimb_status_id)
--- LEFT JOIN ers_reimbursement_type rtype ON (reimb.reimb_type_id = rtype.reimb_type_id)
--- ORDER BY reimb.reimb_id;
-
 --------------------TEST SELECT------------------
 -- SELECT * FROM ers_reimbursement_type;
 -- SELECT * FROM ers_reimbursement_status; 
 -- SELECT * FROM ers_user_roles;
-SELECT TO_TIMESTAMP ('10-Sep-02 14:10:10.123000', 'DD-Mon-RR HH24:MI:SS.FF')
-FROM DUAL;
 SELECT * FROM ers_users;
 SELECT * FROM ers_reimbursement;

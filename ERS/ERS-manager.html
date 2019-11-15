@@ -31,11 +31,12 @@
       </ul>
     </div>
   </nav>
+
   <h1>Reimbursements</h1>
   <table class="table" id="pokemon-table">
     <thead class="thead-dark">
       <tr>
-        <th scope="col">Reimbursement ID</th>
+        <th scope="col">ID</th>
         <th scope="col">Aount</th>
         <th scope="col">Submitted Time</th>
         <th scope="col">Resolved Time</th>
@@ -44,37 +45,18 @@
         <th scope="col">Resolver ID</th>
         <th scope="col">Status</th>
         <th scope="col">Type</th>
+        <th scope="col">Actions</th>
       </tr>
     </thead>
     <tbody id="reimb-table-body"></tbody>
+
     </tbody>
+
   </table>
 
-  <form id="new-pokemon-form" onsubmit="newPokemonSubmit(event)">
-    <div class="form-group">
-      <label for="pokemon-name-input">Pokemon Name:</label>
-      <input type="text" class="form-control" id="pokemon-name-input" placeholder="Pikachu">
-    </div>
-    <div class="form-group">
-      <label for="pokemon-type-select">Type</label>
-      <select class="form-control" id="pokemon-type-select">
-        <option>Fire</option>
-        <option>Ghost</option>
-        <option>Dragon</option>
-        <option>Dark</option>
-        <option>Electric</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="pokemon-hp-input">HP:</label>
-      <input type="number" class="form-control" id="pokemon-hp-input">
-    </div>
-    <div class="form-group">
-      <label for="pokemon-level-input">Level:</label>
-      <input type="number" class="form-control" id="pokemon-level-input">
-    </div>
-    <button class="btn btn-danger" type="submit">Submit</button>
-  </form>
+  <button class="btn btn-primary btn-lg" onclick="refreshAllReimbs()">Refresh All</button>
+
+
 
 
 </body>
