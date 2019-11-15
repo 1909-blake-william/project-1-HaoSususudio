@@ -10,12 +10,11 @@ function getCurrentUserInfo() {
       currentUser = data;
       if (currentUser.userRole === 'EMPLOYEE') {
         console.log(currentUser.userRole);
-
+        setupEmployeeMode();
 
       } else if (currentUser.userRole === 'MANAGER') {
-        console.log(currentUser.userRole);
+        console.log(currentUser);
         setupManagerMode();
-        // fetchAndAppendAllReimb();z
       } else {
         // alert('Account role undefined. Contact Admin');
         // window.location.assign('/index.html');
@@ -30,6 +29,12 @@ function getCurrentUserInfo() {
 
 function setupManagerMode() {
   document.getElementById('page-heading').innerText = 'Reimbursements - Manager Mode';
+  let actionsTh = document.createElement('th');
+  actionsTh.scope = 'col';
+  actionsTh.innerText = 'Actions';
+  document.getElementById('reimb-header-row').appendChild(actionsTh);
+
+  managerFetchAppendAll();
 
   let refreshButton = document.createElement('button');
   refreshButton.innerText = 'Refresh All';
@@ -39,30 +44,26 @@ function setupManagerMode() {
 }
 
 
-
-// document.getElementById('page-heading').innerText = 'Reimbursements - Manager Mode';
-// let actionsTh = document.createElement('th');
-// actionsTh.scope = 'col';
-// actionsTh.innerText = 'Actions';
-// // document.getElementById('reimb-header-row').appendChild(actionsTh);
-// console.log('here');
-// const refreshAllButton = document.createElement('button');
-// refreshAllButton.class = 'btn btn-primary btn-lg';
-// refreshAllButton.onclick = refreshAllReimbs;
-// console.log(document.getElementsById('bottom-buttons'));
-// document.getElementsById('bottom-buttons').appendChild(refreshAllButton);
-// // fetchAndAppendAllReimb();
-// console.log('here2');
-
-
-
 function setupEmployeeMode() {
+  employeeFetchAppendAll()
 }
-function fetchAndAppendAllReimb() {
+
+function employeeFetchAppendAll() {
+  let author = currentUser.username;
+  console.log(author);
+  fetch(`http://localhost:8080/DFNERSApi/api/reimbursements/?author=${author}`)
+    .then(res => res.json())
+    .then(data => {
+      data.forEach(employeeAddReimb)
+    })
+    .catch(console.log);
+}
+
+function managerFetchAppendAll() {
   fetch('http://localhost:8080/DFNERSApi/api/reimbursements/')
     .then(res => res.json())
     .then(data => {
-      data.forEach(addReimbursementToTable)
+      data.forEach(managerAddReimb)
     })
     .catch(console.log);
 }
@@ -82,13 +83,13 @@ function newPokemonSubmit(event) {
   })
     .then(res => res.json())
     .then(data => {
-      addReimbursementToTable(data);
+      managerAddReimb(data);
       console.log(data);
     })
     .catch(err => console.log(err));
 }
 
-function addReimbursementToTable(reimbursement) {
+function managerAddReimb(reimbursement) {
 
   // create the row element
   const row = document.createElement('tr');
@@ -139,20 +140,68 @@ function addReimbursementToTable(reimbursement) {
 
   approveButton.innerText = 'Approve';
   approveButton.className = 'btn btn-success';
-  approveButton.onclick = function () { updateReimbStatus(row.id, 2) };
+  approveButton.onclick = function () { updateReimbStatus(parseInt(row.id), 2) };
 
   denyButton.innerText = 'Deny';
   denyButton.className = 'btn btn-danger';
-  denyButton.onclick = function () { updateReimbStatus(row.id, 3) };
+  denyButton.onclick = function () { updateReimbStatus(parseInt(row.id), 3) };
 
   whateverButton.innerText = 'WHATEVER';
   whateverButton.className = 'btn btn-info';
-  whateverButton.onclick = function () { updateReimbStatus(row.id, whateverStatusId()) };
+  whateverButton.onclick = function () { updateReimbStatus(parseInt(row.id), whateverStatusId()) };
 
   managerButtonContainer.appendChild(approveButton);
   managerButtonContainer.appendChild(denyButton);
   managerButtonContainer.appendChild(whateverButton);
   row.appendChild(managerButtonContainer);
+
+  // append the row into the table
+  document.getElementById('reimb-table-body').appendChild(row);
+}
+
+function employeeAddReimb(reimbursement) {
+
+  // create the row element
+  const row = document.createElement('tr');
+  row.id = `${reimbursement.reimbId}`;
+  row.className = 'reimbursement';
+
+  // create all the td elements and append them to the row
+  const reimbId = document.createElement('td');
+  reimbId.innerText = reimbursement.reimbId;
+  row.appendChild(reimbId);
+
+  const amount = document.createElement('td');
+  amount.innerText = reimbursement.amount;
+  row.appendChild(amount);
+
+  const submittedTime = document.createElement('td');
+  submittedTime.innerText = unixTimetoDateTime(reimbursement.submittedTime);
+  row.appendChild(submittedTime);
+
+  const resolvedTime = document.createElement('td');
+  resolvedTime.innerText = unixTimetoDateTime(reimbursement.resolvedTime);
+  row.appendChild(resolvedTime);
+
+  const description = document.createElement('td');
+  description.innerText = reimbursement.description;
+  row.appendChild(description);
+
+  const authorId = document.createElement('td');
+  authorId.innerText = reimbursement.authorId;
+  row.appendChild(authorId);
+
+  const resolverId = document.createElement('td');
+  resolverId.innerText = reimbursement.resolverId;
+  row.appendChild(resolverId);
+
+  const status = document.createElement('td');
+  status.innerText = reimbursement.status;
+  row.appendChild(status);
+
+  const type = document.createElement('td');
+  type.innerText = reimbursement.type;
+  row.appendChild(type);
 
   // append the row into the table
   document.getElementById('reimb-table-body').appendChild(row);
@@ -173,7 +222,7 @@ function whateverStatusId() {
 
 function refreshAllReimbs() {
   removeAllReimbs();
-  fetchAndAppendAllReimb();
+  managerFetchAppendAll();
 }
 
 function removeAllReimbs() {
@@ -183,9 +232,40 @@ function removeAllReimbs() {
     })
 }
 
-function updateReimbStatus(reimbId, newStatusId) {
-  console.log(reimbId, newStatusId);
+function updateReimbStatus(reimbId, statusId) {
+  event.preventDefault(); // stop page from refreshing
+
+  const resolverId = currentUser.userId;
+  let reimbUpdateReq = {
+    reimbId: reimbId,
+    statusId: statusId,
+    resolverId: resolverId
+  };
+
+  const reqData = { username: 'example' };
+
+  // const str1 = '1';
+  // const str1 = '1';
+  // const str1 = '3';
+  console.log(reimbUpdateReq);
+
+  fetch('http://localhost:8080//DFNERSApi/api/reimbursements', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json'
+    },
+    credentials: 'include', // put credentials: 'include' on every request to use session info
+    body: JSON.stringify(reimbUpdateReq)
+  })
+    .then(resp => resp.json())
+    .then(data => {
+      console.log(data);
+    })
+    .catch(err => console.log(err));
 }
+
+
+
 
 function unixTimetoDateTime(unixTimestamp) {
   if (!unixTimestamp) {
