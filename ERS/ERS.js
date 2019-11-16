@@ -26,7 +26,6 @@ function getCurrentUserInfo() {
     })
 }
 
-
 function setupManagerMode() {
   document.getElementById('page-heading').innerText = 'Reimbursements - Manager Mode';
   let actionsTh = document.createElement('th');
@@ -36,6 +35,7 @@ function setupManagerMode() {
 
   managerFetchAppendAll();
 
+
   let refreshButton = document.createElement('button');
   refreshButton.innerText = 'Refresh All';
   refreshButton.className = 'btn btn-primary btn-lg';
@@ -43,9 +43,8 @@ function setupManagerMode() {
   document.getElementById('page-bottom').appendChild(refreshButton);
 }
 
-
 function setupEmployeeMode() {
-  employeeFetchAppendAll()
+  employeeFetchAppendAll();
 }
 
 function employeeFetchAppendAll() {
@@ -54,18 +53,19 @@ function employeeFetchAppendAll() {
   fetch(`http://localhost:8080/DFNERSApi/api/reimbursements/?author=${author}`)
     .then(res => res.json())
     .then(data => {
-      data.forEach(employeeAddReimb)
+      data.forEach(addReimbToTable)
     })
     .catch(console.log);
 }
 
-function managerFetchAppendAll() {
+function managerFetchAppendAll(callback) {
   fetch('http://localhost:8080/DFNERSApi/api/reimbursements/')
     .then(res => res.json())
     .then(data => {
-      data.forEach(managerAddReimb)
+      data.forEach(addReimbToTable);
     })
     .catch(console.log);
+  callback();
 }
 
 function newPokemonSubmit(event) {
@@ -89,134 +89,27 @@ function newPokemonSubmit(event) {
     .catch(err => console.log(err));
 }
 
-function managerAddReimb(reimbursement) {
 
-  // create the row element
-  const row = document.createElement('tr');
-  row.id = `${reimbursement.reimbId}`;
-  row.className = 'reimbursement';
+function addReimbManagerButtons() {
 
-  // create all the td elements and append them to the row
-  const reimbId = document.createElement('td');
-  reimbId.innerText = reimbursement.reimbId;
-  row.appendChild(reimbId);
+  reimbRows = document.querySelectorAll('tbody#reimb-table-body>tr');
+  reimbRows.forEach((row) => {
+    let managerButtonContainer = document.createElement('td');
+    let approveButton = document.createElement('button');
+    let denyButton = document.createElement('button');
 
-  const amount = document.createElement('td');
-  amount.innerText = reimbursement.amount;
-  row.appendChild(amount);
+    approveButton.innerText = 'Approve';
+    approveButton.className = 'btn btn-success';
+    approveButton.onclick = function () { updateReimbStatus(parseInt(row.id), 2) };
+    denyButton.innerText = 'Deny';
+    denyButton.className = 'btn btn-danger';
+    denyButton.onclick = function () { updateReimbStatus(parseInt(row.id), 3) };
 
-  const submittedTime = document.createElement('td');
-  submittedTime.innerText = unixTimetoDateTime(reimbursement.submittedTime);
-  row.appendChild(submittedTime);
+    managerButtonContainer.appendChild(approveButton);
+    managerButtonContainer.appendChild(denyButton);
+    row.appendChild(managerButtonContainer);
+  })
 
-  const resolvedTime = document.createElement('td');
-  resolvedTime.innerText = unixTimetoDateTime(reimbursement.resolvedTime);
-  row.appendChild(resolvedTime);
-
-  const description = document.createElement('td');
-  description.innerText = reimbursement.description;
-  row.appendChild(description);
-
-  const authorId = document.createElement('td');
-  authorId.innerText = reimbursement.authorId;
-  row.appendChild(authorId);
-
-  const resolverId = document.createElement('td');
-  resolverId.innerText = reimbursement.resolverId;
-  row.appendChild(resolverId);
-
-  const status = document.createElement('td');
-  status.innerText = reimbursement.status;
-  row.appendChild(status);
-
-  const type = document.createElement('td');
-  type.innerText = reimbursement.type;
-  row.appendChild(type);
-
-  const managerButtonContainer = document.createElement('td');
-  const approveButton = document.createElement('button');
-  const denyButton = document.createElement('button');
-  const whateverButton = document.createElement('button');
-
-  approveButton.innerText = 'Approve';
-  approveButton.className = 'btn btn-success';
-  approveButton.onclick = function () { updateReimbStatus(parseInt(row.id), 2) };
-
-  denyButton.innerText = 'Deny';
-  denyButton.className = 'btn btn-danger';
-  denyButton.onclick = function () { updateReimbStatus(parseInt(row.id), 3) };
-
-  whateverButton.innerText = 'WHATEVER';
-  whateverButton.className = 'btn btn-info';
-  whateverButton.onclick = function () { updateReimbStatus(parseInt(row.id), whateverStatusId()) };
-
-  managerButtonContainer.appendChild(approveButton);
-  managerButtonContainer.appendChild(denyButton);
-  managerButtonContainer.appendChild(whateverButton);
-  row.appendChild(managerButtonContainer);
-
-  // append the row into the table
-  document.getElementById('reimb-table-body').appendChild(row);
-}
-
-function employeeAddReimb(reimbursement) {
-
-  // create the row element
-  const row = document.createElement('tr');
-  row.id = `${reimbursement.reimbId}`;
-  row.className = 'reimbursement';
-
-  // create all the td elements and append them to the row
-  const reimbId = document.createElement('td');
-  reimbId.innerText = reimbursement.reimbId;
-  row.appendChild(reimbId);
-
-  const amount = document.createElement('td');
-  amount.innerText = reimbursement.amount;
-  row.appendChild(amount);
-
-  const submittedTime = document.createElement('td');
-  submittedTime.innerText = unixTimetoDateTime(reimbursement.submittedTime);
-  row.appendChild(submittedTime);
-
-  const resolvedTime = document.createElement('td');
-  resolvedTime.innerText = unixTimetoDateTime(reimbursement.resolvedTime);
-  row.appendChild(resolvedTime);
-
-  const description = document.createElement('td');
-  description.innerText = reimbursement.description;
-  row.appendChild(description);
-
-  const authorId = document.createElement('td');
-  authorId.innerText = reimbursement.authorId;
-  row.appendChild(authorId);
-
-  const resolverId = document.createElement('td');
-  resolverId.innerText = reimbursement.resolverId;
-  row.appendChild(resolverId);
-
-  const status = document.createElement('td');
-  status.innerText = reimbursement.status;
-  row.appendChild(status);
-
-  const type = document.createElement('td');
-  type.innerText = reimbursement.type;
-  row.appendChild(type);
-
-  // append the row into the table
-  document.getElementById('reimb-table-body').appendChild(row);
-}
-
-
-function whateverStatusId() {
-  let rnd = Math.random();
-  if (rnd <= 0.1) {
-    return 1;
-  } else if (0.1 < rnd && rnd <= 0.7) {
-    return 2;
-  } else if (0.7 < rnd) {
-    return 3;
-  }
 }
 
 
@@ -233,39 +126,38 @@ function removeAllReimbs() {
 }
 
 function updateReimbStatus(reimbId, statusId) {
-  event.preventDefault(); // stop page from refreshing
-
+  // event.preventDefault(); // stop page from refreshing
   const resolverId = currentUser.userId;
   let reimbUpdateReq = {
     reimbId: reimbId,
     statusId: statusId,
     resolverId: resolverId
   };
-
-  const reqData = { username: 'example' };
-
-  // const str1 = '1';
-  // const str1 = '1';
-  // const str1 = '3';
-  console.log(reimbUpdateReq);
-
-  fetch('http://localhost:8080//DFNERSApi/api/reimbursements', {
-    method: 'POST',
+  fetch('http://localhost:8080/DFNERSApi/api/reimbursements/', {
+    method: 'PUT',
     headers: {
       'content-type': 'application/json'
     },
     credentials: 'include', // put credentials: 'include' on every request to use session info
     body: JSON.stringify(reimbUpdateReq)
   })
-    .then(resp => resp.json())
+    .then(res => res.json())
     .then(data => {
       console.log(data);
     })
-    .catch(err => console.log(err));
+    .catch(console.log);
 }
 
-
-
+function whateverStatusId() {
+  let rnd = Math.random();
+  if (rnd <= 0.1) {
+    return 1;
+  } else if (0.1 < rnd && rnd <= 0.7) {
+    return 2;
+  } else if (0.7 < rnd) {
+    return 3;
+  }
+}
 
 function unixTimetoDateTime(unixTimestamp) {
   if (!unixTimestamp) {
@@ -274,4 +166,49 @@ function unixTimetoDateTime(unixTimestamp) {
   return Date(unixTimestamp * 1000);
 }
 
+function addReimbToTable(reimbursement) {
+  // create the row element
+  const row = document.createElement('tr');
+  row.id = `${reimbursement.reimbId}`;
+  row.className = 'reimbursement';
 
+  // create all the td elements and append them to the row
+  const reimbId = document.createElement('td');
+  reimbId.innerText = reimbursement.reimbId;
+  row.appendChild(reimbId);
+
+  const amount = document.createElement('td');
+  amount.innerText = reimbursement.amount;
+  row.appendChild(amount);
+
+  const submittedTime = document.createElement('td');
+  submittedTime.innerText = unixTimetoDateTime(reimbursement.submittedTime);
+  row.appendChild(submittedTime);
+
+  const resolvedTime = document.createElement('td');
+  resolvedTime.innerText = unixTimetoDateTime(reimbursement.resolvedTime);
+  row.appendChild(resolvedTime);
+
+  const description = document.createElement('td');
+  description.innerText = reimbursement.description;
+  row.appendChild(description);
+
+  const authorId = document.createElement('td');
+  authorId.innerText = reimbursement.authorId;
+  row.appendChild(authorId);
+
+  const resolverId = document.createElement('td');
+  resolverId.innerText = reimbursement.resolverId;
+  row.appendChild(resolverId);
+
+  const status = document.createElement('td');
+  status.innerText = reimbursement.status;
+  row.appendChild(status);
+
+  const type = document.createElement('td');
+  type.innerText = reimbursement.type;
+  row.appendChild(type);
+
+  // append the row into the table
+  document.getElementById('reimb-table-body').appendChild(row);
+}

@@ -1,23 +1,30 @@
 package org.deepfakenews.servlets;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.deepfakenews.daos.ReimbursementDao;
 import org.deepfakenews.daos.UserInfoDao;
+import org.deepfakenews.models.UpdateReimbStatusReq;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Dispatcher {
   private static UserInfoDao userDao = UserInfoDao.currentImplementation;
   private static ReimbursementDao reimbDao = ReimbursementDao.currentImplementation;
+  private static UpdateReimbStatusReq updateReimbReq = new UpdateReimbStatusReq();
   private static final String USER_URI = "/DFNERSApi/api/users";
   private static final String REIMBURSEMENT_URI = "/DFNERSApi/api/reimbursements";
-  private static ObjectMapper mapper = new ObjectMapper();
+  private static ObjectMapper objMapper = new ObjectMapper();
   private static Logger log = Logger.getRootLogger();
 
-  public static Object dispatch(HttpServletRequest request, HttpServletResponse response) {
+  public static Object dispatch(HttpServletRequest request, HttpServletResponse response)
+      throws JsonParseException, JsonMappingException, IOException {
     String httpMethod = request.getMethod();
 
     switch (httpMethod) {
@@ -37,7 +44,7 @@ public class Dispatcher {
   public static Object dispatchGET(HttpServletRequest request, HttpServletResponse response) {
     String reqURI = request.getRequestURI();
     if (reqURI.startsWith(USER_URI)) {
-      log.debug("dispatchGETUse");
+      log.debug("dispatch GET");
       return dispatchGETUser(request, response);
     } else if (reqURI.startsWith(REIMBURSEMENT_URI)) {
       return dispatchGETReimbursements(request, response);
@@ -49,7 +56,7 @@ public class Dispatcher {
   public static Object dispatchGETUser(HttpServletRequest request, HttpServletResponse response) {
     String username = request.getParameter("username");
     String userIdStr = request.getParameter("userid");
-    log.debug(userIdStr);
+    log.debug("dispatch GET" + userIdStr);
     if (username != null) {
       return userDao.findByUsername(username);
     } else if (userIdStr != null) {
@@ -64,6 +71,7 @@ public class Dispatcher {
       HttpServletResponse response) {
     String authorUsername = request.getParameter("author");
     String reimbStatus = request.getParameter("status");
+    log.debug("dispatch GET Reimb");
     log.debug(authorUsername + "  " + reimbStatus);
     if (authorUsername == null && reimbStatus == null) {
       return reimbDao.findAll();
@@ -81,7 +89,8 @@ public class Dispatcher {
     return null;
   }
 
-  private static Object dispatchPUT(HttpServletRequest request, HttpServletResponse response) {
+  private static Object dispatchPUT(HttpServletRequest request, HttpServletResponse response)
+      throws JsonParseException, JsonMappingException, IOException {
     String reqURI = request.getRequestURI();
     if (reqURI.startsWith(REIMBURSEMENT_URI)) {
       log.debug("dispatch PUT on reimbursement");
@@ -92,11 +101,16 @@ public class Dispatcher {
   }
 
   public static Object dispatchPUTReimbursements(HttpServletRequest request,
-      HttpServletResponse response) {
-    log.debug("dispatch PUT on reimbursement");
-    Integer reimbId = Integer.valueOf(request.getParameter("reimbId"));
-    Integer statusId = Integer.valueOf(request.getParameter("statusId"));
-    Integer resolverId = Integer.valueOf(request.getParameter("resolverId"));
+      HttpServletResponse response) throws JsonParseException, JsonMappingException, IOException {
+    log.debug("Inside dispatchPUTReimbursements");
+    updateReimbReq = (UpdateReimbStatusReq) objMapper.readValue(request.getReader(),
+        UpdateReimbStatusReq.class);
+//        request.getSession().getAttribute("sessionUser");
+//    inUNPW = (UsernameAndPW) om.readValue(req.getReader(), UsernameAndPW.class);
+    log.debug(updateReimbReq);
+    Integer reimbId = Integer.valueOf(updateReimbReq.getReimbId());
+    Integer statusId = Integer.valueOf(updateReimbReq.getStatusId());
+    Integer resolverId = Integer.valueOf(updateReimbReq.getResolverId());
     log.debug(reimbId + "  " + statusId + " " + resolverId);
     return reimbDao.updateStatus(reimbId, statusId, resolverId);
   }
