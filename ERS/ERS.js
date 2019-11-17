@@ -1,6 +1,8 @@
 let currentUser;
 getCurrentUserInfo();
 
+
+
 function getCurrentUserInfo() {
   fetch('http://localhost:8080/DFNERSApi/auth/session-user', {
     credentials: 'include'
@@ -33,14 +35,13 @@ function setupManagerMode() {
   actionsTh.innerText = 'Actions';
   document.getElementById('reimb-header-row').appendChild(actionsTh);
 
-  managerFetchAppendAll();
-
-
   let refreshButton = document.createElement('button');
   refreshButton.innerText = 'Refresh All';
   refreshButton.className = 'btn btn-primary btn-lg';
   refreshButton.onclick = refreshAllReimbs;
   document.getElementById('page-bottom').appendChild(refreshButton);
+
+  managerFetchAppendAll();
 }
 
 function setupEmployeeMode() {
@@ -53,64 +54,47 @@ function employeeFetchAppendAll() {
   fetch(`http://localhost:8080/DFNERSApi/api/reimbursements/?author=${author}`)
     .then(res => res.json())
     .then(data => {
-      data.forEach(addReimbToTable)
+      data.forEach((reimb) => {
+        let row = convertReimbToRow(reimb);
+        addRowToReimbTable(row);
+      })
     })
     .catch(console.log);
 }
 
-function managerFetchAppendAll(callback) {
+function managerFetchAppendAll() {
   fetch('http://localhost:8080/DFNERSApi/api/reimbursements/')
     .then(res => res.json())
     .then(data => {
-      data.forEach(addReimbToTable);
-    })
-    .catch(console.log);
-  callback();
-}
-
-function newPokemonSubmit(event) {
-  event.preventDefault(); // stop page from refreshing
-  console.log('submitted');
-
-  const pokemon = getPokemonFromInputs();
-
-  fetch('http://localhost:8080/PokemonApi/pokemon', {
-    method: 'POST',
-    body: JSON.stringify(pokemon),
-    headers: {
-      'content-type': 'application/json'
-    }
-  })
-    .then(res => res.json())
-    .then(data => {
-      managerAddReimb(data);
-      console.log(data);
+      data.forEach((reimb) => {
+        let row = convertReimbToRow(reimb);
+        addRowToReimbTable(row);
+        appendManagerButtonsToRow(row, reimb.status);
+      })
     })
     .catch(err => console.log(err));
 }
 
+// function newPokemonSubmit(event) {
+//   event.preventDefault(); // stop page from refreshing
+//   console.log('submitted');
 
-function addReimbManagerButtons() {
+//   const pokemon = getPokemonFromInputs();
 
-  reimbRows = document.querySelectorAll('tbody#reimb-table-body>tr');
-  reimbRows.forEach((row) => {
-    let managerButtonContainer = document.createElement('td');
-    let approveButton = document.createElement('button');
-    let denyButton = document.createElement('button');
-
-    approveButton.innerText = 'Approve';
-    approveButton.className = 'btn btn-success';
-    approveButton.onclick = function () { updateReimbStatus(parseInt(row.id), 2) };
-    denyButton.innerText = 'Deny';
-    denyButton.className = 'btn btn-danger';
-    denyButton.onclick = function () { updateReimbStatus(parseInt(row.id), 3) };
-
-    managerButtonContainer.appendChild(approveButton);
-    managerButtonContainer.appendChild(denyButton);
-    row.appendChild(managerButtonContainer);
-  })
-
-}
+//   fetch('http://localhost:8080/PokemonApi/pokemon', {
+//     method: 'POST',
+//     body: JSON.stringify(pokemon),
+//     headers: {
+//       'content-type': 'application/json'
+//     }
+//   })
+//     .then(res => res.json())
+//     .then(data => {
+//       managerAddReimb(data);
+//       console.log(data);
+//     })
+//     .catch(err => console.log(err));
+// }
 
 
 function refreshAllReimbs() {
@@ -133,17 +117,21 @@ function updateReimbStatus(reimbId, statusId) {
     statusId: statusId,
     resolverId: resolverId
   };
-  fetch('http://localhost:8080/DFNERSApi/api/reimbursements/', {
-    method: 'PUT',
-    headers: {
-      'content-type': 'application/json'
-    },
-    credentials: 'include', // put credentials: 'include' on every request to use session info
-    body: JSON.stringify(reimbUpdateReq)
-  })
+  fetch('http://localhost:8080/DFNERSApi/api/reimbursements/',
+    {
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json'
+      },
+      credentials: 'include', // put credentials: 'include' on every request to use session info
+      body: JSON.stringify(reimbUpdateReq)
+    })
     .then(res => res.json())
     .then(data => {
-      console.log(data);
+      let oldReimb = document.querySelector(`tr.reimbursement[id="${data.reimbId}"]`);
+      let newReimb = convertReimbToRow(data);
+      appendManagerButtonsToRow(newReimb, data.status);
+      oldReimb.replaceWith(newReimb);
     })
     .catch(console.log);
 }
@@ -163,10 +151,10 @@ function unixTimetoDateTime(unixTimestamp) {
   if (!unixTimestamp) {
     return null;
   }
-  return Date(unixTimestamp * 1000);
+  return new Date(unixTimestamp);
 }
 
-function addReimbToTable(reimbursement) {
+function convertReimbToRow(reimbursement) {
   // create the row element
   const row = document.createElement('tr');
   row.id = `${reimbursement.reimbId}`;
@@ -187,6 +175,7 @@ function addReimbToTable(reimbursement) {
 
   const resolvedTime = document.createElement('td');
   resolvedTime.innerText = unixTimetoDateTime(reimbursement.resolvedTime);
+  resolvedTime.id = 'resolved-time';
   row.appendChild(resolvedTime);
 
   const description = document.createElement('td');
@@ -199,16 +188,48 @@ function addReimbToTable(reimbursement) {
 
   const resolverId = document.createElement('td');
   resolverId.innerText = reimbursement.resolverId;
+  resolverId.id = 'resolverId';
   row.appendChild(resolverId);
 
   const status = document.createElement('td');
   status.innerText = reimbursement.status;
+  status.id = 'status';
   row.appendChild(status);
 
   const type = document.createElement('td');
   type.innerText = reimbursement.type;
   row.appendChild(type);
 
-  // append the row into the table
+  return row;
+}
+
+function appendManagerButtonsToRow(row, status) {
+  let managerButtonContainer = document.createElement('td');
+  let approveButton = document.createElement('button');
+  let denyButton = document.createElement('button');
+
+  approveButton.innerText = 'Approve';
+  approveButton.className = 'btn btn-success';
+  denyButton.innerText = 'Deny';
+  denyButton.className = 'btn btn-danger';
+
+  if ('PENDING' === status) {
+    approveButton.onclick = function () { updateReimbStatus(parseInt(row.id), 2) };
+    denyButton.onclick = function () { updateReimbStatus(parseInt(row.id), 3) };
+
+  } else {
+    // approveButton.setAttribute('disabled', '');
+    // denyButton.setAttribute('disabled', '');
+    approveButton.onclick = function () { updateReimbStatus(parseInt(row.id), 2) };
+    denyButton.onclick = function () { updateReimbStatus(parseInt(row.id), 3) };
+  }
+
+  managerButtonContainer.appendChild(approveButton);
+  managerButtonContainer.appendChild(denyButton);
+  row.insertAdjacentElement('beforeend', managerButtonContainer);
+}
+
+
+function addRowToReimbTable(row) {
   document.getElementById('reimb-table-body').appendChild(row);
 }

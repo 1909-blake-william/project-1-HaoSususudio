@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.deepfakenews.daos.ReimbursementDao;
 import org.deepfakenews.daos.UserInfoDao;
-import org.deepfakenews.models.UpdateReimbStatusReq;
+import org.deepfakenews.models.ReimbUpdateReq;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Dispatcher {
   private static UserInfoDao userDao = UserInfoDao.currentImplementation;
   private static ReimbursementDao reimbDao = ReimbursementDao.currentImplementation;
-  private static UpdateReimbStatusReq updateReimbReq = new UpdateReimbStatusReq();
+  private static ReimbUpdateReq reimbUpdateReq = new ReimbUpdateReq();
   private static final String USER_URI = "/DFNERSApi/api/users";
   private static final String REIMBURSEMENT_URI = "/DFNERSApi/api/reimbursements";
   private static ObjectMapper objMapper = new ObjectMapper();
@@ -103,14 +103,14 @@ public class Dispatcher {
   public static Object dispatchPUTReimbursements(HttpServletRequest request,
       HttpServletResponse response) throws JsonParseException, JsonMappingException, IOException {
     log.debug("Inside dispatchPUTReimbursements");
-    updateReimbReq = (UpdateReimbStatusReq) objMapper.readValue(request.getReader(),
-        UpdateReimbStatusReq.class);
+    reimbUpdateReq = (ReimbUpdateReq) objMapper.readValue(request.getReader(),
+        ReimbUpdateReq.class);
 //        request.getSession().getAttribute("sessionUser");
 //    inUNPW = (UsernameAndPW) om.readValue(req.getReader(), UsernameAndPW.class);
-    log.debug(updateReimbReq);
-    Integer reimbId = Integer.valueOf(updateReimbReq.getReimbId());
-    Integer statusId = Integer.valueOf(updateReimbReq.getStatusId());
-    Integer resolverId = Integer.valueOf(updateReimbReq.getResolverId());
+    log.debug(reimbUpdateReq);
+    Integer reimbId = Integer.valueOf(reimbUpdateReq.getReimbId());
+    Integer statusId = Integer.valueOf(reimbUpdateReq.getStatusId());
+    Integer resolverId = Integer.valueOf(reimbUpdateReq.getResolverId());
     log.debug(reimbId + "  " + statusId + " " + resolverId);
     return reimbDao.updateStatus(reimbId, statusId, resolverId);
   }

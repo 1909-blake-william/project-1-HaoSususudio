@@ -152,7 +152,7 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
       CallableStatement cs = c.prepareCall("call update_reimb_status(?, ?, ?)");
       cs.setInt(1, reimbId);
       cs.setInt(2, statusId);
-      cs.setInt(3, statusId);
+      cs.setInt(3, resolverId);
       cs.execute();
 
       cs = c.prepareCall("call get_reimb_by_id(?, ?)");

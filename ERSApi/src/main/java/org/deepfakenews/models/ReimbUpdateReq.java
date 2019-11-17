@@ -1,16 +1,16 @@
 package org.deepfakenews.models;
 
-public class UpdateReimbStatusReq {
+public class ReimbUpdateReq {
   Integer reimbId;
   Integer statusId;
   Integer resolverId;
 
-  public UpdateReimbStatusReq() {
+  public ReimbUpdateReq() {
     super();
     // TODO Auto-generated constructor stub
   }
 
-  public UpdateReimbStatusReq(Integer reimbId, Integer statusId, Integer resolverId) {
+  public ReimbUpdateReq(Integer reimbId, Integer statusId, Integer resolverId) {
     super();
     this.reimbId = reimbId;
     this.statusId = statusId;
