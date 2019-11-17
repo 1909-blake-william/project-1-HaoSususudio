@@ -1,31 +1,65 @@
+let userDirectory;
+let usernamMap = new Map();
 let currentUser;
-getCurrentUserInfo();
+setupPage();
 
+async function setupPage() {
+  try {
+    await makeUsernamMap();
+    await getCurrentUserInfo();
+    if (currentUser.userRole === 'EMPLOYEE') {
+      setupEmployeeMode();
+    }
+    else if (currentUser.userRole === 'MANAGER') {
+      setupManagerMode();
+    }
+    else {
+      alert('Account role undefined. Contact Admin');
+      window.location.assign('/index.html');
+    }
+  } catch (error) {
+    console.log('error');
+    window.location.assign('/index.html');
+  }
+}
 
+async function getUserDirectory() {
+  try {
+    const resp = await fetch('http://localhost:8080/DFNERSApi/api/users/', {
+      credentials: 'include'
+    });
+    const data = await resp.json();
+    userDirectory = data;
+  }
+  catch (err) {
+    console.log('error');
+  }
+}
 
-function getCurrentUserInfo() {
-  fetch('http://localhost:8080/DFNERSApi/auth/session-user', {
-    credentials: 'include'
-  })
-    .then(resp => resp.json())
-    .then(data => {
-      currentUser = data;
-      if (currentUser.userRole === 'EMPLOYEE') {
-        console.log(currentUser.userRole);
-        setupEmployeeMode();
-
-      } else if (currentUser.userRole === 'MANAGER') {
-        console.log(currentUser);
-        setupManagerMode();
-      } else {
-        // alert('Account role undefined. Contact Admin');
-        // window.location.assign('/index.html');
-      }
+async function makeUsernamMap() {
+  try {
+    await getUserDirectory();
+    userDirectory.forEach(userInfo => {
+      usernamMap.set(userInfo.userId, userInfo.username);
     })
-    .catch(err => {
-      // console.log('error');
-      // window.location.assign('/index.html');
-    })
+  } catch (error) {
+    console.log('error');
+  }
+}
+
+async function getCurrentUserInfo() {
+  try {
+    const resp = await fetch('http://localhost:8080/DFNERSApi/auth/session-user', {
+      credentials: 'include'
+    });
+    const data = await resp.json();
+    currentUser = data;
+
+  }
+  catch (err) {
+    console.log('error');
+    window.location.assign('/index.html');
+  }
 }
 
 function setupManagerMode() {
@@ -96,7 +130,6 @@ function managerFetchAppendAll() {
 //     .catch(err => console.log(err));
 // }
 
-
 function refreshAllReimbs() {
   removeAllReimbs();
   managerFetchAppendAll();
@@ -153,6 +186,8 @@ function unixTimetoDateTime(unixTimestamp) {
   }
   return new Date(unixTimestamp);
 }
+
+console.log(usernamMap.get(1));
 
 function convertReimbToRow(reimbursement) {
   // create the row element
