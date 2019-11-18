@@ -24,13 +24,14 @@ public class AuthServlet extends HttpServlet {
   private static UserInfo sessionUser = new UserInfo();
   private static UserInfoDao userInfoDao = UserInfoDao.currentImplementation;
   private static final String LOGIN_URI = "/DFNERSApi/auth/login";
+  private static final String LOGOUT_URI = "/DFNERSApi/auth/logout";
   private static final String SESSION_USER_URI = "/DFNERSApi/auth/session-user";
 
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     resp.addHeader("Access-Control-Allow-Origin", "http://localhost:5500");
-    resp.addHeader("Access-Control-Allow-Methods", "POST, GET");
+    resp.addHeader("Access-Control-Allow-Methods", "POST, GET, PUT");
     resp.addHeader("Access-Control-Allow-Headers",
         "Origin, Methods, Credentials, X-Requested-With, Content-Type, Accept");
     resp.addHeader("Access-Control-Allow-Credentials", "true");
@@ -79,6 +80,18 @@ public class AuthServlet extends HttpServlet {
       Object json = req.getSession().getAttribute("sessionUser");
       log.debug(json);
       resp.getWriter().write(om.writeValueAsString(json));
+    }
+  }
+
+  @Override
+  protected void doPut(HttpServletRequest req, HttpServletResponse resp)
+      throws ServletException, IOException {
+    log.debug("doPut in AuthServlet");
+    log.debug("reqUri = " + req.getRequestURI());
+    if (LOGOUT_URI.equals(req.getRequestURI())) {
+      log.debug("user is logging out");
+      req.getSession().invalidate();
+      resp.getWriter().write("your are logged out");
     }
   }
 

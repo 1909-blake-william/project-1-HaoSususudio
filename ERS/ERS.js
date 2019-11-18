@@ -4,15 +4,11 @@ let currentUser;
 let reimbData;
 
 setupPage();
-$("#new-reimb-form").submit(function (e) {
-  e.preventDefault();
-});
 
 async function setupPage() {
   try {
     await makefullnameMap();
     await getCurrentUserInfo();
-    console.log(currentUser);
     if (currentUser.userRole === 'EMPLOYEE') {
       setupEmployeeMode();
     }
@@ -21,11 +17,11 @@ async function setupPage() {
     }
     else {
       alert('Account role undefined. Contact Admin');
-      window.location.assign('/index.html');
+      window.location.replace('/index.html');
     }
   } catch (error) {
     console.log('error');
-    window.location.assign('/index.html');
+    window.location.replace('/index.html');
   }
 }
 
@@ -61,11 +57,10 @@ async function getCurrentUserInfo() {
     });
     const data = await resp.json();
     currentUser = data;
-
   }
   catch (err) {
     console.log('error');
-    window.location.assign('/index.html');
+    window.location.replace('/index.html');
   }
 }
 
@@ -90,11 +85,18 @@ function setupManagerMode() {
   viewDeniedBtn.onclick = () => { managerRefreshReimb('denied') };
   document.getElementById('above-reimb-table').appendChild(viewDeniedBtn);
 
-  let viewAllbtn = document.createElement('button');
-  viewAllbtn.innerText = 'View all';
-  viewAllbtn.className = 'btn btn-info btn-lg';
-  viewAllbtn.onclick = () => { managerRefreshReimb('') };
-  document.getElementById('above-reimb-table').appendChild(viewAllbtn);
+  let viewAllBtn = document.createElement('button');
+  viewAllBtn.innerText = 'View all';
+  viewAllBtn.className = 'btn btn-info btn-lg';
+  viewAllBtn.onclick = () => { managerRefreshReimb('') };
+  document.getElementById('above-reimb-table').appendChild(viewAllBtn);
+
+  let whateverBtn = document.createElement('button');
+  whateverBtn.innerText = 'WHATEVER';
+  whateverBtn.id = 'whatever-btn';
+  whateverBtn.className = 'btn btn-secondary btn-lg';
+  whateverBtn.onclick = () => { whatever() };
+  document.getElementById('above-reimb-table').appendChild(whateverBtn);
 
   managerRefreshReimb('pending');
 }
@@ -123,7 +125,6 @@ function setupEmployeeMode() {
   viewAllbtn.className = 'btn btn-info btn-lg';
   viewAllbtn.onclick = () => { employeeRefreshReimb('') };
   document.getElementById('above-reimb-table').appendChild(viewAllbtn);
-
 
   employeeRefreshReimb('pending');
   createNewReimbForm();
@@ -204,19 +205,11 @@ function createNewReimbForm() {
   newReimbForm.appendChild(submitButton);
   newReimbFormDiv.appendChild(newReimbForm);
   document.getElementById('page-bottom').appendChild(newReimbFormDiv);
-  // reimb_amount IN number,
-  // reimb_description IN varchar2,
-  // reimb_author IN number,
-  // reimb_type_id IN number,
-  // generated_id OUT number
-
 }
 
 async function submitNewReimb(event) {
   event.preventDefault();
-  console.log('submitted');
   const newReimb = getReimbFromInputs();
-  console.log(newReimb);
 
   try {
     const resp = fetch('http://localhost:8080/DFNERSApi/api/reimbursements/', {
@@ -231,25 +224,10 @@ async function submitNewReimb(event) {
       .then(data => {
         document.getElementById('new-reimb-form').reset();
         employeeRefreshReimb('pending');
-        console.log(data);
       })
   } catch (error) {
     console.log(err);
   }
-  // fetch('http://localhost:8080/DFNERSApi/api/reimbursements/', {
-  //   method: 'POST',
-  //   credentials: 'include',
-  //   headers: {
-  //     'content-type': 'application/json'
-  //   },
-  //   body: JSON.stringify(newReimb)
-  // })
-  //   .then(resp => resp.json())
-  //   .then(data => {
-  //     //       managerAddReimb(data);
-  //     console.log(data);
-  //   })
-  //   .catch(err => console.log(err));
 }
 
 function getReimbFromInputs() {
@@ -303,7 +281,6 @@ async function fetchReimb(author, status) {
   }
 }
 
-
 function removeAllReimbs() {
   document.querySelectorAll('tr.reimbursement')
     .forEach(ele => {
@@ -311,7 +288,7 @@ function removeAllReimbs() {
     })
 }
 
-function updateReimbStatus(reimbId, statusId) {
+async function updateReimbStatus(reimbId, statusId) {
   // event.preventDefault(); // stop page from refreshing
   const resolverId = currentUser.userId;
   let reimbUpdateReq = {
@@ -335,19 +312,76 @@ function updateReimbStatus(reimbId, statusId) {
       appendManagerButtonsToRow(newReimb, data.status);
       oldReimb.replaceWith(newReimb);
     })
-    .catch(console.log);
+    .catch(err => console.log(err))
+}
+
+function logout() {
+  fetch('http://localhost:8080/DFNERSApi/auth/logout', {
+    method: 'PUT',
+    headers: {
+      'content-type': 'application/json'
+    },
+    credentials: 'include', // put credentials: 'include' on every request to use session info
+  }).then(() => {
+    currentUser = null;
+    window.location.replace('/index.html')
+  })
+}
+
+
+async function whatever() {
+  startWhateverSpinner();
+  await fetchReimb('', 'pending');
+  await reimbData.forEach((reimb) => {
+    batchUpdateReimbStatus(parseInt(reimb.reimbId), whateverStatusId());
+  });
+  await managerRefreshReimb('pending');
+  stopWhateverSpinner();
+}
+
+async function batchUpdateReimbStatus(reimbId, statusId) {
+  // event.preventDefault(); // stop page from refreshing
+  const resolverId = currentUser.userId;
+  let reimbUpdateReq = {
+    reimbId: reimbId,
+    statusId: statusId,
+    resolverId: resolverId
+  };
+  fetch('http://localhost:8080/DFNERSApi/api/reimbursements/',
+    {
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json'
+      },
+      credentials: 'include', // put credentials: 'include' on every request to use session info
+      body: JSON.stringify(reimbUpdateReq)
+    })
+    .catch(err => console.log(err))
 }
 
 function whateverStatusId() {
   let rnd = Math.random();
-  if (rnd <= 0.1) {
-    return 1;
-  } else if (0.1 < rnd && rnd <= 0.7) {
+  if (rnd <= 0.7) {
     return 2;
   } else if (0.7 < rnd) {
     return 3;
   }
 }
+
+function startWhateverSpinner() {
+  whateverbtn = document.getElementById('whatever-btn');
+  whateverbtn.disabled = 'true';
+  whateverbtn.innerHTML =
+    ` <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span class="sr-only">WHATEVER...</span>`;
+}
+
+function stopWhateverSpinner() {
+  whateverbtn = document.getElementById('whatever-btn');
+  // document.getElementById('whatever-btn').removeattribute('disabled');
+  whateverbtn.removeAttribute('disabled');
+  whateverbtn.innerHTML = 'WHATEVER';
+}
+
 
 function unixTimetoDateTime(unixTimestamp) {
   if (!unixTimestamp) {
@@ -357,7 +391,6 @@ function unixTimetoDateTime(unixTimestamp) {
 
   return date.toDateString() + ' ' + date.toLocaleTimeString();
 }
-
 
 function convertReimbToRow(reimbursement) {
   // create the row element
@@ -423,10 +456,10 @@ function appendManagerButtonsToRow(row, status) {
     denyButton.onclick = () => { updateReimbStatus(parseInt(row.id), 3) };
 
   } else {
-    // approveButton.setAttribute('disabled', '');
-    // denyButton.setAttribute('disabled', '');
-    approveButton.onclick = () => { updateReimbStatus(parseInt(row.id), 2) };
-    denyButton.onclick = () => { updateReimbStatus(parseInt(row.id), 3) };
+    approveButton.setAttribute('disabled', '');
+    denyButton.setAttribute('disabled', '');
+    // approveButton.onclick = () => { updateReimbStatus(parseInt(row.id), 2) };
+    // denyButton.onclick = () => { updateReimbStatus(parseInt(row.id), 3) };
   }
 
   managerButtonContainer.appendChild(approveButton);

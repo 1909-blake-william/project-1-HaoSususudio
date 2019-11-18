@@ -109,4 +109,4 @@ function getCurrentUserInfo() {
     })
 }
 
-getCurrentUserInfo();
+// getCurrentUserInfo();
