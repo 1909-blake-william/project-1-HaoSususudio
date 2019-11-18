@@ -2,12 +2,13 @@ package org.deepfakenews.daos;
 
 import java.util.List;
 
+import org.deepfakenews.models.NewReimbReq;
 import org.deepfakenews.models.Reimbursement;
 
 public interface ReimbursementDao {
   ReimbursementDao currentImplementation = new ReimbursementDaoSQL();
 
-  int requestNew(Reimbursement reimb);
+  Reimbursement postNewReimbursement(NewReimbReq newReimb);
 
   Reimbursement updateStatus(int reimbId, int statusId, int resolverId);
 
@@ -20,5 +21,7 @@ public interface ReimbursementDao {
   List<Reimbursement> findByStatus(String status);
 
   List<Reimbursement> findByAuthorAndStatus(String authorUsername, String status);
+
+
 
 }

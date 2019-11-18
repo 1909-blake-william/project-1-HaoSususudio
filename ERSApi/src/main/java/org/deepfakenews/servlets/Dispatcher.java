@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.deepfakenews.daos.ReimbursementDao;
 import org.deepfakenews.daos.UserInfoDao;
+import org.deepfakenews.models.NewReimbReq;
 import org.deepfakenews.models.ReimbUpdateReq;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -18,6 +19,7 @@ public class Dispatcher {
   private static UserInfoDao userDao = UserInfoDao.currentImplementation;
   private static ReimbursementDao reimbDao = ReimbursementDao.currentImplementation;
   private static ReimbUpdateReq reimbUpdateReq = new ReimbUpdateReq();
+  private static NewReimbReq newReimbReq = new NewReimbReq();
   private static final String USER_URI = "/DFNERSApi/api/users";
   private static final String REIMBURSEMENT_URI = "/DFNERSApi/api/reimbursements";
   private static ObjectMapper objMapper = new ObjectMapper();
@@ -34,7 +36,6 @@ public class Dispatcher {
       return dispatchPOST(request, response);
     case "PUT":
       return dispatchPUT(request, response);
-//      break;
     default:
       return null;
     }
@@ -69,8 +70,9 @@ public class Dispatcher {
 
   public static Object dispatchGETReimbursements(HttpServletRequest request,
       HttpServletResponse response) {
-    String authorUsername = request.getParameter("author");
     String reimbStatus = request.getParameter("status");
+    String authorUsername = request.getParameter("author");
+
     log.debug("dispatch GET Reimb");
     log.debug("authorUsername = " + authorUsername);
     log.debug("reimbStatus = " + reimbStatus);
@@ -89,9 +91,31 @@ public class Dispatcher {
     }
   }
 
-  private static Object dispatchPOST(HttpServletRequest request, HttpServletResponse response) {
-    // TODO Auto-generated method stub
-    return null;
+  private static Object dispatchPOST(HttpServletRequest request, HttpServletResponse response)
+      throws JsonParseException, JsonMappingException, IOException {
+    String reqURI = request.getRequestURI();
+    if (reqURI.startsWith(REIMBURSEMENT_URI)) {
+      log.debug("dispatch POST on reimbursement");
+      return dispatchPOSTReimbursements(request, response);
+    } else {
+      return null;
+    }
+  }
+
+  public static Object dispatchPOSTReimbursements(HttpServletRequest request,
+      HttpServletResponse response) throws JsonParseException, JsonMappingException, IOException {
+    log.debug("Dispatch POST Reimbursements");
+    newReimbReq = (NewReimbReq) objMapper.readValue(request.getReader(), NewReimbReq.class);
+
+    log.debug(newReimbReq);
+
+//    double amount = Double.valueOf(newReimbReq.getAmount());
+//    Integer authorId = Integer.valueOf(newReimbReq.getAuthorId());
+//    String description = newReimbReq.getDescription();
+//    Integer typeId = Integer.valueOf(newReimbReq.getTypeId());
+//    log.debug(amount + "  " + authorId + " " + description + " " + typeId);
+    return reimbDao.postNewReimbursement(newReimbReq);
+
   }
 
   private static Object dispatchPUT(HttpServletRequest request, HttpServletResponse response)
@@ -116,7 +140,7 @@ public class Dispatcher {
     Integer reimbId = Integer.valueOf(reimbUpdateReq.getReimbId());
     Integer statusId = Integer.valueOf(reimbUpdateReq.getStatusId());
     Integer resolverId = Integer.valueOf(reimbUpdateReq.getResolverId());
-    log.debug(reimbId + "  " + statusId + " " + resolverId);
+    log.debug("reimbId = " + reimbId + ", statusId = " + statusId + ", resolverId = " + resolverId);
     return reimbDao.updateStatus(reimbId, statusId, resolverId);
   }
 

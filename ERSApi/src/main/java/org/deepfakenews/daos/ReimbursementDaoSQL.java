@@ -5,10 +5,12 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.deepfakenews.models.NewReimbReq;
 import org.deepfakenews.models.Reimbursement;
 import org.deepfakenews.util.ConnectionUtil;
 
@@ -31,12 +33,6 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
 
     return new Reimbursement(reimbId, amount, submittedTime, resolvedTime, description, authorId,
         resolverId, status, type);
-  }
-
-  @Override
-  public int requestNew(Reimbursement reimb) {
-
-    return 0;
   }
 
   @Override
@@ -157,6 +153,38 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
 
       cs = c.prepareCall("call get_reimb_by_id(?, ?)");
       cs.setInt(1, reimbId);
+      cs.registerOutParameter(2, OracleTypes.CURSOR);
+      cs.execute();
+      ResultSet rs = (ResultSet) cs.getObject(2);
+
+      if (rs.next()) {
+        return extractReimb(rs);
+      } else {
+        return null;
+      }
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  @Override
+  public Reimbursement postNewReimbursement(NewReimbReq newReimb) {
+    log.debug("Attempting to Post a new reimbursement in DB");
+    try (Connection c = ConnectionUtil.getConnection()) {
+      CallableStatement cs = c.prepareCall("call request_new_reimbursement(?,?,?,?,?)");
+      cs.setDouble(1, newReimb.getAmount());
+      cs.setString(2, newReimb.getDescription());
+      cs.setInt(3, newReimb.getAuthorId());
+      cs.setInt(4, newReimb.getTypeId());
+      cs.registerOutParameter(5, Types.INTEGER);
+      cs.execute();
+      int generatedId = cs.getInt(5);
+      log.debug("generated reimbursement id is: " + generatedId);
+
+      cs = c.prepareCall("call get_reimb_by_id(?, ?)");
+      cs.setInt(1, generatedId);
       cs.registerOutParameter(2, OracleTypes.CURSOR);
       cs.execute();
       ResultSet rs = (ResultSet) cs.getObject(2);
