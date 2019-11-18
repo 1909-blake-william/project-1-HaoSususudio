@@ -21,7 +21,7 @@ function login(event) {
     .then(resp => {
       if (resp.status === 201) {
         document.getElementById('error-message').innerText = 'Successful login';
-        window.location.assign('/DFNERS.html');
+        window.location.assign('/Chip-n-Dale-ERS.html');
       }
       else {
         document.getElementById('error-message').innerText = 'Failed to login';
