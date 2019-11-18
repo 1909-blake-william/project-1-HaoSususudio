@@ -480,9 +480,14 @@ function appendEmpolyeeButtonsToRow(row, status) {
   } else if ('DENIED' === status) {
     actionBtn.innerText = 'Dispute';
     actionBtn.className = 'btn btn-secondary';
+    actionBtn.onclick = redirectToDipute;
   }
   actionContainer.appendChild(actionBtn);
   row.insertAdjacentElement('beforeend', actionContainer);
+}
+
+function redirectToDipute() {
+  window.location.assign('/dispute.html');
 }
 
 function addRowToReimbTable(row) {

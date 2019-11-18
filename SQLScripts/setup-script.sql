@@ -385,13 +385,10 @@ BEGIN
   UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('05-Nov-19 12:20:05.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 14;
   UPDATE ers_reimbursement SET reimb_submitted = TO_TIMESTAMP ('07-Nov-19 09:10:55.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 15;
   update_reimb_status(1, 2, 1);
-  update_reimb_status(2, 2, 1);
   update_reimb_status(3, 3, 1);
   update_reimb_status(6, 2, 1);
   update_reimb_status(7, 3, 1);
   UPDATE ers_reimbursement SET reimb_resolved = TO_TIMESTAMP ('13-Oct-19 09:23:11.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 1;
-  UPDATE ers_reimbursement SET reimb_resolved = TO_TIMESTAMP ('13-Oct-19 09:24:45.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 2;
-  UPDATE ers_reimbursement SET reimb_resolved = TO_TIMESTAMP ('13-Oct-19 09:29:55.123000', 'DD-Mon-RR HH24:MI:SS.FF') WHERE reimb_id = 3;
   -------mo' reimbs-------------
   request_new_reimbursement(18.00, 'Chestnut Cake', 3, 3, gen_id);
   request_new_reimbursement(2720.58, 'Car Rental - Lambogini', 3, 2, gen_id);
