@@ -72,15 +72,20 @@ public class Dispatcher {
     String authorUsername = request.getParameter("author");
     String reimbStatus = request.getParameter("status");
     log.debug("dispatch GET Reimb");
-    log.debug(authorUsername + "  " + reimbStatus);
-    if (authorUsername == null && reimbStatus == null) {
+    log.debug("authorUsername = " + authorUsername);
+    log.debug("reimbStatus = " + reimbStatus);
+
+    if (!isConcrete(authorUsername) && !isConcrete(reimbStatus)) {
       return reimbDao.findAll();
-    } else if (reimbStatus == null) {
+    } else if (isConcrete(authorUsername) && !isConcrete(reimbStatus)) {
       return reimbDao.findByAuthorUsername(authorUsername);
-    } else if (authorUsername == null) {
+    } else if (!isConcrete(authorUsername) && isConcrete(reimbStatus)) {
       return reimbDao.findByStatus(reimbStatus);
-    } else {
+    } else if (isConcrete(authorUsername) && isConcrete(reimbStatus)) {
       return reimbDao.findByAuthorAndStatus(authorUsername, reimbStatus);
+    } else {
+      response.setStatus(400);
+      return null;
     }
   }
 
@@ -115,4 +120,11 @@ public class Dispatcher {
     return reimbDao.updateStatus(reimbId, statusId, resolverId);
   }
 
+  public static boolean isConcrete(String queryArg) {
+    if (queryArg != null && queryArg.length() > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
